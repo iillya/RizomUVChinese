@@ -41,7 +41,6 @@ std::atomic<ULONGLONG> g_missingTextCaptureUntil{0};
 std::atomic<bool> g_hotkeyRegistrationSucceeded{false};
 
 constexpr int kCaptureHotkeyId = 1;
-constexpr UINT_PTR kCaptureFlushTimerId = 2;
 constexpr ULONGLONG kCaptureDurationMilliseconds = 1500;
 
 struct MissingTextEntry {
@@ -183,6 +182,7 @@ DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
     if (!registered) return 1;
 
     bool writeFailureLogged = false;
+    UINT_PTR flushTimerId = 0;
     MSG message{};
     while (GetMessageW(&message, nullptr, 0, 0) > 0) {
         if (message.message == WM_HOTKEY &&
@@ -190,17 +190,19 @@ DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
             g_missingTextCaptureUntil.store(
                 GetTickCount64() + kCaptureDurationMilliseconds,
                 std::memory_order_release);
-            SetTimer(nullptr, kCaptureFlushTimerId,
-                     static_cast<UINT>(kCaptureDurationMilliseconds + 250), nullptr);
+            if (flushTimerId) KillTimer(nullptr, flushTimerId);
+            flushTimerId = SetTimer(nullptr, 0,
+                static_cast<UINT>(kCaptureDurationMilliseconds + 250), nullptr);
             RuntimeLog(L"已触发 UI 漏词探测：持续 1.5 秒");
         } else if (message.message == WM_TIMER &&
-                   message.wParam == kCaptureFlushTimerId &&
+                   message.wParam == flushTimerId &&
                    GetTickCount64() > g_missingTextCaptureUntil.load(
                        std::memory_order_acquire)) {
             const bool dirty = g_missingTextDirty.exchange(
                 false, std::memory_order_acq_rel);
             if (!dirty || WriteMissingTextSnapshot()) {
-                KillTimer(nullptr, kCaptureFlushTimerId);
+                KillTimer(nullptr, flushTimerId);
+                flushTimerId = 0;
                 writeFailureLogged = false;
                 const std::filesystem::path outputDirectory =
                     g_missingTextPath.parent_path();
@@ -216,7 +218,7 @@ DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
             }
         }
     }
-    KillTimer(nullptr, kCaptureFlushTimerId);
+    if (flushTimerId) KillTimer(nullptr, flushTimerId);
     UnregisterHotKey(nullptr, kCaptureHotkeyId);
     return 0;
 }
