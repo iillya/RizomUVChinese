@@ -23,21 +23,10 @@ std::filesystem::path RuntimeDirectory() {
     return std::filesystem::path(std::wstring(path.data(), length)).parent_path();
 }
 
-std::filesystem::path CaptureDirectory() {
-    std::vector<wchar_t> path(32768);
-    const DWORD length = GetEnvironmentVariableW(
-        L"LOCALAPPDATA", path.data(), static_cast<DWORD>(path.size()));
-    if (length > 0 && length < path.size())
-        return std::filesystem::path(std::wstring(path.data(), length)) /
-               L"RizomUVChinese";
-    return RuntimeDirectory();
-}
-
 DWORD WINAPI InitializeLocalizer(void*) {
     using namespace rizomuv::localizer;
     const std::filesystem::path directory = RuntimeDirectory();
-    const std::filesystem::path captureDirectory = CaptureDirectory();
-    InitializeRuntimeLog(captureDirectory);
+    InitializeRuntimeLog(directory);
     RuntimeLog(L"RizomUV 中文运行时开始初始化");
 
     std::wstring error;
@@ -48,8 +37,9 @@ DWORD WINAPI InitializeLocalizer(void*) {
     }
     RuntimeLog(L"已加载词条：" + std::to_wstring(g_dictionary.Size()));
 
-    if (StartMissingTextCapture(captureDirectory, error))
-        RuntimeLog(L"漏词采集已启用，输出目录：" + captureDirectory.wstring());
+    if (StartMissingTextCapture(directory, error))
+        RuntimeLog(L"UI 漏词探测已就绪：按 Shift + ~ 触发 1.5 秒，输出目录：" +
+                   directory.wstring());
     else
         RuntimeLog(L"漏词采集启动失败：" + error);
 

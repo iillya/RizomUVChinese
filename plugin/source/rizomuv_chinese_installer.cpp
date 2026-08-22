@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <aclapi.h>
 #include <commctrl.h>
 #include <shlobj.h>
 #include <shobjidl.h>
@@ -191,6 +192,49 @@ bool CreateShortcut(const std::filesystem::path& shortcut,
     return ok;
 }
 
+bool GrantCurrentUserPluginAccess(const std::filesystem::path& directory) {
+    HANDLE token = nullptr;
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token)) return false;
+    DWORD required = 0;
+    GetTokenInformation(token, TokenUser, nullptr, 0, &required);
+    std::vector<unsigned char> tokenInformation(required);
+    const bool tokenRead = required > 0 && GetTokenInformation(
+        token, TokenUser, tokenInformation.data(), required, &required) != FALSE;
+    CloseHandle(token);
+    if (!tokenRead) return false;
+
+    auto* tokenUser = reinterpret_cast<TOKEN_USER*>(tokenInformation.data());
+    PACL currentDacl = nullptr;
+    PSECURITY_DESCRIPTOR securityDescriptor = nullptr;
+    const DWORD securityRead = GetNamedSecurityInfoW(
+        const_cast<wchar_t*>(directory.c_str()), SE_FILE_OBJECT,
+        DACL_SECURITY_INFORMATION, nullptr, nullptr, &currentDacl, nullptr,
+        &securityDescriptor);
+    if (securityRead != ERROR_SUCCESS) return false;
+
+    EXPLICIT_ACCESSW access{};
+    access.grfAccessPermissions = FILE_GENERIC_READ | FILE_GENERIC_WRITE |
+                                  FILE_GENERIC_EXECUTE | DELETE;
+    access.grfAccessMode = GRANT_ACCESS;
+    access.grfInheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
+    access.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    access.Trustee.TrusteeType = TRUSTEE_IS_USER;
+    access.Trustee.ptstrName = static_cast<LPWSTR>(tokenUser->User.Sid);
+
+    PACL updatedDacl = nullptr;
+    const DWORD aclCreated = SetEntriesInAclW(1, &access, currentDacl, &updatedDacl);
+    bool applied = false;
+    if (aclCreated == ERROR_SUCCESS) {
+        applied = SetNamedSecurityInfoW(
+            const_cast<wchar_t*>(directory.c_str()), SE_FILE_OBJECT,
+            DACL_SECURITY_INFORMATION, nullptr, nullptr, updatedDacl,
+            nullptr) == ERROR_SUCCESS;
+    }
+    if (updatedDacl) LocalFree(updatedDacl);
+    LocalFree(securityDescriptor);
+    return applied;
+}
+
 std::vector<std::filesystem::path> ShortcutPaths() {
     return {
         KnownFolder(FOLDERID_Desktop) / L"RizomUV 简体中文版.lnk",
@@ -243,6 +287,16 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
         }
         std::filesystem::remove_all(stagingDirectory, filesystemError);
         message = L"安装失败，已恢复安装前的汉化文件。";
+        return false;
+    }
+    if (!GrantCurrentUserPluginAccess(pluginDirectory)) {
+        std::error_code rollbackError;
+        std::filesystem::remove_all(pluginDirectory, rollbackError);
+        if (hadPrevious && !rollbackError)
+            std::filesystem::rename(backupDirectory, pluginDirectory, rollbackError);
+        message = rollbackError
+            ? L"无法设置漏词探测文件的写入权限，且自动回滚失败。"
+            : L"无法设置漏词探测文件的写入权限，已恢复安装前状态。";
         return false;
     }
     if (hadPrevious) std::filesystem::remove_all(backupDirectory, filesystemError);

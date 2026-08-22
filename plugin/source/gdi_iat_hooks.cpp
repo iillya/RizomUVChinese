@@ -36,6 +36,12 @@ std::filesystem::path g_missingTextPath;
 std::mutex g_missingTextMutex;
 std::atomic<bool> g_missingTextDirty{false};
 std::atomic<bool> g_missingTextCaptureStarted{false};
+std::atomic<ULONGLONG> g_missingTextCaptureUntil{0};
+std::atomic<bool> g_hotkeyRegistrationSucceeded{false};
+
+constexpr int kCaptureHotkeyId = 1;
+constexpr UINT_PTR kCaptureFlushTimerId = 2;
+constexpr ULONGLONG kCaptureDurationMilliseconds = 1500;
 
 struct MissingTextEntry {
     std::wstring text;
@@ -103,6 +109,7 @@ std::string JsonEscape(const std::wstring& value) {
 
 void CaptureMissingText(const wchar_t* api, const std::wstring& source) {
     if (!g_missingTextCaptureStarted.load(std::memory_order_relaxed) ||
+        GetTickCount64() > g_missingTextCaptureUntil.load(std::memory_order_relaxed) ||
         !IsMissingTextCandidate(source)) return;
     // This runs in RizomUV's drawing path: never stall rendering for telemetry.
     std::unique_lock<std::mutex> lock(g_missingTextMutex, std::try_to_lock);
@@ -167,13 +174,46 @@ bool WriteMissingTextSnapshot() {
     return true;
 }
 
-DWORD WINAPI MissingTextWriterThread(void*) {
-    for (;;) {
-        Sleep(3000);
-        if (g_missingTextDirty.exchange(false, std::memory_order_acq_rel) &&
-            !WriteMissingTextSnapshot())
-            g_missingTextDirty.store(true, std::memory_order_release);
+DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
+    const bool registered = RegisterHotKey(nullptr, kCaptureHotkeyId,
+        MOD_SHIFT | MOD_NOREPEAT, VK_OEM_3) != FALSE;
+    g_hotkeyRegistrationSucceeded.store(registered, std::memory_order_release);
+    SetEvent(static_cast<HANDLE>(readyEventValue));
+    if (!registered) return 1;
+
+    bool writeFailureLogged = false;
+    MSG message{};
+    while (GetMessageW(&message, nullptr, 0, 0) > 0) {
+        if (message.message == WM_HOTKEY &&
+            message.wParam == static_cast<WPARAM>(kCaptureHotkeyId)) {
+            g_missingTextCaptureUntil.store(
+                GetTickCount64() + kCaptureDurationMilliseconds,
+                std::memory_order_release);
+            SetTimer(nullptr, kCaptureFlushTimerId,
+                     static_cast<UINT>(kCaptureDurationMilliseconds + 250), nullptr);
+            RuntimeLog(L"已触发 UI 漏词探测：持续 1.5 秒");
+        } else if (message.message == WM_TIMER &&
+                   message.wParam == kCaptureFlushTimerId &&
+                   GetTickCount64() > g_missingTextCaptureUntil.load(
+                       std::memory_order_acquire)) {
+            const bool dirty = g_missingTextDirty.exchange(
+                false, std::memory_order_acq_rel);
+            if (!dirty || WriteMissingTextSnapshot()) {
+                KillTimer(nullptr, kCaptureFlushTimerId);
+                writeFailureLogged = false;
+            } else {
+                g_missingTextDirty.store(true, std::memory_order_release);
+                if (!writeFailureLogged) {
+                    RuntimeLog(L"漏词文件写入失败，将继续重试：" +
+                               g_missingTextPath.wstring());
+                    writeFailureLogged = true;
+                }
+            }
+        }
     }
+    KillTimer(nullptr, kCaptureFlushTimerId);
+    UnregisterHotKey(nullptr, kCaptureHotkeyId);
+    return 0;
 }
 
 struct TextView { LPCWSTR text; int length; };
@@ -249,13 +289,29 @@ bool StartMissingTextCapture(const std::filesystem::path& outputDirectory,
     }
     g_missingTextPath = outputDirectory /
         (L"missing_ui_text_" + std::to_wstring(GetCurrentProcessId()) + L".jsonl");
-    HANDLE thread = CreateThread(nullptr, 0, MissingTextWriterThread, nullptr, 0, nullptr);
-    if (!thread) {
+    HANDLE readyEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (!readyEvent) {
         g_missingTextCaptureStarted.store(false);
-        error = L"无法启动漏词写入线程";
+        error = L"无法创建漏词探测同步事件";
         return false;
     }
+    HANDLE thread = CreateThread(nullptr, 0, MissingTextCaptureThread,
+                                 readyEvent, 0, nullptr);
+    if (!thread) {
+        CloseHandle(readyEvent);
+        g_missingTextCaptureStarted.store(false);
+        error = L"无法启动漏词探测线程";
+        return false;
+    }
+    const DWORD ready = WaitForSingleObject(readyEvent, INFINITE);
+    CloseHandle(readyEvent);
     CloseHandle(thread);
+    if (ready != WAIT_OBJECT_0 ||
+        !g_hotkeyRegistrationSucceeded.load(std::memory_order_acquire)) {
+        g_missingTextCaptureStarted.store(false);
+        error = L"无法注册 Shift + ~ 漏词探测快捷键";
+        return false;
+    }
     return true;
 }
 

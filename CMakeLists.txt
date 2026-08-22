@@ -59,7 +59,8 @@ add_executable(RizomUVChineseInstaller WIN32
 target_compile_features(RizomUVChineseInstaller PRIVATE cxx_std_17)
 target_compile_definitions(RizomUVChineseInstaller PRIVATE
   UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
-target_link_libraries(RizomUVChineseInstaller PRIVATE user32 shell32 ole32 comctl32)
+target_link_libraries(RizomUVChineseInstaller PRIVATE
+  user32 shell32 ole32 comctl32 advapi32)
 file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/installer_payload_$<CONFIG>.rc" CONTENT
 "201 RCDATA \"$<TARGET_FILE:RizomUVChineseLauncher>\"
 202 RCDATA \"$<TARGET_FILE:RizomUVChineseRuntime>\"

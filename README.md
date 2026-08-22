@@ -19,6 +19,7 @@ distribution\安装RizomUV汉化.exe
 点击“一键安装汉化”后会：
 
 - 将启动器、运行时 DLL 和中文词库安装到 `RizomUV 2025.0\RizomUVChinese`；
+- 仅为执行安装的当前用户开放该插件目录的修改权限，以便保存手动嗅探结果；
 - 在桌面和开始菜单创建“RizomUV 简体中文版”快捷方式；
 - 采用临时目录写入和旧版本回滚，避免更新失败留下半安装状态；
 - 保持 `rizomuv.exe` 及 RizomUV 自带文件不变。
@@ -29,18 +30,20 @@ distribution\安装RizomUV汉化.exe
 当前安装包使用正式词库 `ui_zh-CN.json`。未翻译的长说明也保留在词库中，
 以“英文原文 → 英文原文”的方式维持原始显示，后续翻译审核后再替换译文。
 
-正式运行时会将词库中不存在的英文界面文字去重记录到：
+正式运行时默认不采集漏词。需要探测当前界面时，按一次 `Shift + ~`，运行时只在
+接下来的 1.5 秒内记录词库中不存在的英文界面文字，并保存到插件目录：
 
 ```text
-%LOCALAPPDATA%\RizomUVChinese\missing_ui_text_进程ID.jsonl
+C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_进程ID.jsonl
 ```
 
-记录由后台线程定期更新，不会在 GDI 绘制调用中直接写磁盘。完成一轮界面遍历后，
+未触发时不会进行漏词统计；触发结束后由后台线程写盘，不会在 GDI 绘制调用中
+直接写磁盘。完成一轮界面遍历后，
 可将漏词记录重新分类为待翻译目录：
 
 ```powershell
 python plugin\development\tools\build_translation_catalog.py `
-  (Get-ChildItem "$env:LOCALAPPDATA\RizomUVChinese\missing_ui_text_*.jsonl").FullName `
+  (Get-ChildItem "C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_*.jsonl").FullName `
   --existing plugin\translations\ui_zh-CN.json `
   --output plugin\development\translation_catalogs\rizomuv_2025.0.104
 ```
@@ -67,8 +70,8 @@ build-msvc\Release\RizomUVChineseLauncher.exe
 ```
 
 启动器挂起启动原版 RizomUV，加载 `RizomUVChineseRuntime.dll` 后恢复主线程。
-运行时从同目录的 `ui_zh-CN.json` 加载词库；诊断日志和漏词记录统一写入
-`%LOCALAPPDATA%\RizomUVChinese`，避免普通用户无法写入安装目录。
+运行时从同目录的 `ui_zh-CN.json` 加载词库；诊断日志和手动触发生成的漏词记录
+均写入插件目录。
 
 2025.0.104 当前正式词库包含 3836 条映射，其中 3624 条中文译文、212 条需要
 保持原样的快捷键、单位和产品名。启动实测中运行时成功加载全部词条，绘制与测量
