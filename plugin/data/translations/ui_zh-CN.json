@@ -1,0 +1,32 @@
+{
+  "$schema": "rizomuv-localizer-translation-v1",
+  "language": "zh-CN",
+  "description": "RizomUV 简体中文界面样片词库",
+  "translations": {
+    "File": "文件",
+    "Help": "帮助",
+    "Open": "打开",
+    "Save": "保存",
+    "Save As...": "另存为...",
+    "Auto Save": "自动保存",
+    "UV Set": "UV 集",
+    "Select": "选择",
+    "Brush": "笔刷",
+    "Seams": "接缝",
+    "Unwrap": "展开",
+    "Projections": "投影",
+    "Transform": "变换",
+    "Misc Transforms": "其他变换",
+    "Similar": "相似项",
+    "Auto Seams": "自动接缝",
+    "Packing": "排布",
+    "Script Hub": "脚本中心",
+    "Contextual Help": "上下文帮助",
+    "Cut": "切割",
+    "Weld": "焊接",
+    "Unfold": "展开",
+    "Optimize": "优化",
+    "Pack": "排布",
+    "Preferences...": "首选项..."
+  }
+}

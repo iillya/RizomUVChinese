@@ -1,0 +1,18 @@
+{
+  "$schema": "rizomuv-localizer-translation-v1",
+  "id": "review-internal",
+  "language": "zh-CN",
+  "description": "疑似路径或内部标识，翻译前必须人工确认",
+  "translations": {
+    "Enable/Disable": "",
+    "tx/cm": "",
+    "tx/dm": "",
+    "tx/ft": "",
+    "tx/in": "",
+    "tx/km": "",
+    "tx/m": "",
+    "tx/mi": "",
+    "tx/mm": "",
+    "tx/yd": ""
+  }
+}

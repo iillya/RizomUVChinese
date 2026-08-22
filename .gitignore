@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# Local probe builds and generated reports
+.tools/
+build/
+build-*/
+dependencies/reference/
+rizomuv-ui*.json
+rizomuv-localized-ui.json
+RizomUV_text_sniffer.jsonl
+.translation-runtime/
