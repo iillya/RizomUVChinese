@@ -81,22 +81,41 @@ bool IsValidRizomDirectory(const std::filesystem::path& directory) {
     return valid;
 }
 
-bool IsRizomUVRunning() {
+std::vector<DWORD> RizomUVProcessIds() {
+    std::vector<DWORD> processIds;
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (snapshot == INVALID_HANDLE_VALUE) return false;
+    if (snapshot == INVALID_HANDLE_VALUE) return processIds;
     PROCESSENTRY32W process{};
     process.dwSize = sizeof(process);
-    bool running = false;
     if (Process32FirstW(snapshot, &process)) {
         do {
-            if (_wcsicmp(process.szExeFile, L"rizomuv.exe") == 0) {
-                running = true;
-                break;
-            }
+            if (_wcsicmp(process.szExeFile, L"rizomuv.exe") == 0)
+                processIds.push_back(process.th32ProcessID);
         } while (Process32NextW(snapshot, &process));
     }
     CloseHandle(snapshot);
-    return running;
+    return processIds;
+}
+
+bool IsRizomUVRunning() {
+    return !RizomUVProcessIds().empty();
+}
+
+bool TerminateRizomUVProcesses() {
+    bool success = true;
+    for (DWORD processId : RizomUVProcessIds()) {
+        HANDLE process = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE,
+                                     FALSE, processId);
+        if (!process) {
+            success = false;
+            continue;
+        }
+        if (!TerminateProcess(process, 0) ||
+            WaitForSingleObject(process, 5000) != WAIT_OBJECT_0)
+            success = false;
+        CloseHandle(process);
+    }
+    return success && !IsRizomUVRunning();
 }
 
 std::filesystem::path DefaultRizomDirectory() {
@@ -428,6 +447,24 @@ LRESULT CALLBACK WindowProcedure(HWND window, UINT message, WPARAM wParam, LPARA
                 MessageBoxW(window, L"所选目录中没有有效的 x64 rizomuv.exe。\n\n请选择 RizomUV 的实际安装目录。",
                             kTitle, MB_OK | MB_ICONERROR);
                 return 0;
+            }
+            const std::vector<DWORD> runningProcesses = RizomUVProcessIds();
+            if (!runningProcesses.empty()) {
+                std::wstring prompt = L"检测到 RizomUV 仍在后台运行（PID ";
+                for (size_t index = 0; index < runningProcesses.size(); ++index) {
+                    if (index) prompt += L", ";
+                    prompt += std::to_wstring(runningProcesses[index]);
+                }
+                prompt += L"）。\n\n是否强制结束后台进程后继续？\n"
+                          L"未保存的 RizomUV 数据可能丢失。";
+                if (MessageBoxW(window, prompt.c_str(), kTitle,
+                                MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) != IDYES)
+                    return 0;
+                if (!TerminateRizomUVProcesses()) {
+                    MessageBoxW(window, L"无法结束后台 RizomUV 进程。\n请在任务管理器中结束后重试。",
+                                kTitle, MB_OK | MB_ICONERROR);
+                    return 0;
+                }
             }
             std::wstring result;
             const bool ok = id == kInstallButton ? Install(directory, result) : Uninstall(directory, result);
