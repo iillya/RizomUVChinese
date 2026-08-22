@@ -4,6 +4,7 @@
 #include "rizomuv_localizer/translation_dictionary.h"
 
 #include <winnt.h>
+#include <shellapi.h>
 
 #include <algorithm>
 #include <atomic>
@@ -201,6 +202,10 @@ DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
             if (!dirty || WriteMissingTextSnapshot()) {
                 KillTimer(nullptr, kCaptureFlushTimerId);
                 writeFailureLogged = false;
+                const std::filesystem::path outputDirectory =
+                    g_missingTextPath.parent_path();
+                ShellExecuteW(nullptr, L"open", outputDirectory.c_str(),
+                              nullptr, nullptr, SW_SHOWNORMAL);
             } else {
                 g_missingTextDirty.store(true, std::memory_order_release);
                 if (!writeFailureLogged) {

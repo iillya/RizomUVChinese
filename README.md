@@ -38,7 +38,7 @@ C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_进程I
 ```
 
 未触发时不会进行漏词统计；触发结束后由后台线程写盘，不会在 GDI 绘制调用中
-直接写磁盘。完成一轮界面遍历后，
+直接写磁盘。1.5 秒探测结束并完成写入后，插件会自动打开输出目录。完成一轮界面遍历后，
 可将漏词记录重新分类为待翻译目录：
 
 ```powershell
