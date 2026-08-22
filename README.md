@@ -149,7 +149,7 @@ C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_进程I
 plugin\translations\ui_zh-CN.json
 ```
 
-RizomUV 2025.0.104 词库目前包含 3836 条映射，其中包括中文译文，以及必须保持原样的快捷键、单位和产品名称。
+RizomUV 2025.0.104 词库目前包含 3835 条映射，其中包括中文译文，以及必须保持原样的快捷键、单位和产品名称。
 
 ## 开发与构建
 
