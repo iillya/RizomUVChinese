@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <aclapi.h>
+#include <tlhelp32.h>
 #include <commctrl.h>
 #include <shlobj.h>
 #include <shobjidl.h>
@@ -78,6 +79,24 @@ bool IsValidRizomDirectory(const std::filesystem::path& directory) {
     }
     CloseHandle(file);
     return valid;
+}
+
+bool IsRizomUVRunning() {
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) return false;
+    PROCESSENTRY32W process{};
+    process.dwSize = sizeof(process);
+    bool running = false;
+    if (Process32FirstW(snapshot, &process)) {
+        do {
+            if (_wcsicmp(process.szExeFile, L"rizomuv.exe") == 0) {
+                running = true;
+                break;
+            }
+        } while (Process32NextW(snapshot, &process));
+    }
+    CloseHandle(snapshot);
+    return running;
 }
 
 std::filesystem::path DefaultRizomDirectory() {
@@ -243,17 +262,32 @@ std::vector<std::filesystem::path> ShortcutPaths() {
 }
 
 bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message) {
+    if (IsRizomUVRunning()) {
+        message = L"RizomUV 正在运行。\n请先关闭 RizomUV，再安装汉化。";
+        return false;
+    }
     std::vector<PayloadEntry> entries;
     if (!LoadPayloadResources(entries)) { message = L"安装包资源不完整。"; return false; }
     const auto pluginDirectory = rizomDirectory / kPluginFolder;
     const auto stagingDirectory = rizomDirectory / L"RizomUVChinese.installing";
     const auto backupDirectory = rizomDirectory / L"RizomUVChinese.previous";
     std::error_code filesystemError;
+    if (!std::filesystem::exists(pluginDirectory) &&
+        std::filesystem::exists(backupDirectory)) {
+        std::filesystem::rename(backupDirectory, pluginDirectory, filesystemError);
+        if (filesystemError) {
+            message = L"检测到上次更新留下的备份，但无法自动恢复。";
+            return false;
+        }
+    }
     std::filesystem::remove_all(stagingDirectory, filesystemError);
-    filesystemError.clear();
+    if (filesystemError) {
+        message = L"无法清理上次安装留下的临时目录。";
+        return false;
+    }
     std::filesystem::remove_all(backupDirectory, filesystemError);
     if (filesystemError) {
-        message = L"无法清理上次安装留下的临时目录。\n请关闭 RizomUV 后重试。";
+        message = L"无法清理上次安装留下的备份目录。";
         return false;
     }
     std::wstring error;
@@ -316,6 +350,10 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
 }
 
 bool Uninstall(const std::filesystem::path& rizomDirectory, std::wstring& message) {
+    if (IsRizomUVRunning()) {
+        message = L"RizomUV 正在运行。\n请先关闭 RizomUV，再拆卸汉化。";
+        return false;
+    }
     for (const auto& shortcut : ShortcutPaths()) {
         std::error_code ignored;
         std::filesystem::remove(shortcut, ignored);
