@@ -148,13 +148,11 @@ bool LoadPayloadResources(std::vector<PayloadEntry>& entries) {
 bool ExtractPayload(const std::vector<PayloadEntry>& entries,
                     const std::filesystem::path& destination, std::wstring& error) {
     std::error_code filesystemError;
-    std::filesystem::create_directories(destination / L"translations", filesystemError);
+    std::filesystem::create_directories(destination, filesystemError);
     if (filesystemError) { error = L"无法创建汉化目录"; return false; }
     bool ok = true;
     for (const auto& entry : entries) {
-        std::filesystem::path target = destination / entry.name;
-        if (wcscmp(entry.name, L"ui_zh-CN.json") == 0)
-            target = destination / L"translations" / L"ui_zh-CN.json";
+        const std::filesystem::path target = destination / entry.name;
         HANDLE output = CreateFileW(target.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
                                     FILE_ATTRIBUTE_NORMAL, nullptr);
         if (output == INVALID_HANDLE_VALUE) { ok = false; break; }
@@ -221,7 +219,7 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
         return false;
     }
     for (const auto* required : {L"RizomUVChineseLauncher.exe", L"RizomUVChineseRuntime.dll",
-                                  L"translations\\ui_zh-CN.json"}) {
+                                  L"ui_zh-CN.json"}) {
         if (!std::filesystem::is_regular_file(stagingDirectory / required)) {
             std::filesystem::remove_all(stagingDirectory, filesystemError);
             message = L"安装文件自检失败，原汉化未被修改。";
@@ -342,6 +340,7 @@ LRESULT CALLBACK WindowProcedure(HWND window, UINT message, WPARAM wParam, LPARA
             std::wstring result;
             const bool ok = id == kInstallButton ? Install(directory, result) : Uninstall(directory, result);
             MessageBoxW(window, result.c_str(), kTitle, MB_OK | (ok ? MB_ICONINFORMATION : MB_ICONERROR));
+            if (ok) DestroyWindow(window);
             return 0;
         }
         break;

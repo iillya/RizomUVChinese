@@ -1,0 +1,5677 @@
+{
+  "$schema": "rizomuv-localizer-catalog-v1",
+  "sourceLogs": [
+    "C:\\Users\\liuwenbo\\AppData\\Local\\RizomUVChinese\\missing_ui_text_19348.jsonl",
+    "C:\\Users\\liuwenbo\\AppData\\Local\\RizomUVChinese\\missing_ui_text.jsonl"
+  ],
+  "summary": {
+    "uniqueEntries": 549,
+    "malformedLines": 0,
+    "categories": {
+      "descriptions": 24,
+      "ignored_shortcuts_numbers": 50,
+      "interface_labels": 213,
+      "review_internal": 3,
+      "tooltips": 259
+    },
+    "existingDictionaryEntries": 1735,
+    "existingEntriesSeenInCapture": 0
+  },
+  "entries": [
+    {
+      "source": "\t\tAlso, USD files can only be saved when the model as been loaded from a USD file. If you want to save a model that has been loaded from another file format, you must save it as FBX or OBJ.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 189,
+      "translation": ""
+    },
+    {
+      "source": "\t\tNote that OBJ files can only store a single UV set(single channel).If you wish to work with several UV channels, consider using FBX or USD format. ",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 149,
+      "translation": ""
+    },
+    {
+      "source": " `~!@#$%^&*()-_=+\\|[]{};:\"'<,>.?/1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 95,
+      "translation": ""
+    },
+    {
+      "source": "- Back Only, displays only the back faces.This mode is helpful to isolate and fix polygons with inverted normals.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 113,
+      "translation": ""
+    },
+    {
+      "source": "- Front Only, displays only the front faces.Back faces are hidden, making it easier to spot flipped normals or incorrectly oriented polygons.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 141,
+      "translation": ""
+    },
+    {
+      "source": "- Front Shaded / Back Solid Color, renders front faces normally(with shading) while displaying back faces in a solid color.This makes backfaces easy to identify while keeping a realistic preview of the overall geometry.\"",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 220,
+      "translation": ""
+    },
+    {
+      "source": "0 Hidden",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 45,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "0 Selected",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 33,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "3D Background low part",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 22,
+      "translation": ""
+    },
+    {
+      "source": "3D Background up part",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "3D Borders Color$$Mesh's 3D space borders color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 47,
+      "translation": ""
+    },
+    {
+      "source": "3D Space Borders",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "3DSMax",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 6,
+      "translation": ""
+    },
+    {
+      "source": "Add select",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Add select  Rotate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 18,
+      "translation": ""
+    },
+    {
+      "source": "Add select  Scale",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Add select  Translate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "Add select & Rotate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 19,
+      "translation": ""
+    },
+    {
+      "source": "Add select & Scale",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 18,
+      "translation": ""
+    },
+    {
+      "source": "Add select & Translate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 22,
+      "translation": ""
+    },
+    {
+      "source": "Add select element",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 18,
+      "translation": ""
+    },
+    {
+      "source": "Add select group content",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 24,
+      "translation": ""
+    },
+    {
+      "source": "Add select loop",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Add select shortest path",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 24,
+      "translation": ""
+    },
+    {
+      "source": "Add select tile",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Add Tile",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Alt-LMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Alt-MMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Alt-RMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Alt-Shift-C",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Alt-Shift-R",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Alt-Shift-S",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 20,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Anti-Aliasing Sample Count Channel A$$Anti aliasing sample count for rendering polygons",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 87,
+      "translation": ""
+    },
+    {
+      "source": "Anti-Aliasing Sample Count Channel B$$Anti aliasing sample count for rendering polygons",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 87,
+      "translation": ""
+    },
+    {
+      "source": "Apply Texel Density$$Once you've picked or set your Texel Density, clicking the Apply Density icon scales selection to the specified texel density.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 147,
+      "translation": ""
+    },
+    {
+      "source": "Auto deselect islands after isolate action",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 18,
+      "length": 42,
+      "translation": ""
+    },
+    {
+      "source": "Auto Isolate Island$$Enable/Disable automatic islands isolation. When on, islands which haven't any edge selected will be automatically hidden.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 143,
+      "translation": ""
+    },
+    {
+      "source": "Auto Save File Amount$$Auto save file amount",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 44,
+      "translation": ""
+    },
+    {
+      "source": "Auto save folder path",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "Auto Save Folder Path Browser$$Opens a file selector to select folder to save backup files into.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 96,
+      "translation": ""
+    },
+    {
+      "source": "Auto Save Folder Path$$Auto save feature will save the backup files into that folder.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 85,
+      "translation": ""
+    },
+    {
+      "source": "Auto save time interval",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 23,
+      "translation": ""
+    },
+    {
+      "source": "Auto Save Time Interval$$Auto save time interval in minutes",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 59,
+      "translation": ""
+    },
+    {
+      "source": "Auto Save$$Expand Auto Save panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 33,
+      "translation": ""
+    },
+    {
+      "source": "Available Sets",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 51,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Average Normal Projection$$Project 3D geometry using the average normal of each islands or each isolated group of selected primitives. Applied on selection if non-empty or on everything in the contrary case.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 207,
+      "translation": ""
+    },
+    {
+      "source": "BACK",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 19,
+      "length": 4,
+      "translation": ""
+    },
+    {
+      "source": "Back face render",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Back Face Rendering$$-Front and Back: Displays both front and back faces with the same shading.Useful for quickly visualizing the entire geometry without distinction.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 166,
+      "translation": ""
+    },
+    {
+      "source": "Back Only",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Background color",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Background Color Channel A$$Background color mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 49,
+      "translation": ""
+    },
+    {
+      "source": "Background Color Channel B$$Background color mode is selected",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 61,
+      "translation": ""
+    },
+    {
+      "source": "Background Mode Channel A$$Background rendering mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 52,
+      "translation": ""
+    },
+    {
+      "source": "Background Mode Channel B$$Background rendering mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 52,
+      "translation": ""
+    },
+    {
+      "source": "Big",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "bmp",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Borders in DXF",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Borders only",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Box Info File Path$$Box info file path",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Browse defined hotkeys, click one of them then compose the Hotkey. Right Click to unassign.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 91,
+      "translation": ""
+    },
+    {
+      "source": "Browse External Text Editor Path$$Show a file selector that allows to select your program editor.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 97,
+      "translation": ""
+    },
+    {
+      "source": "Browse Omniverse",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Browse Remote Control File$$Remote Control File Path",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 52,
+      "translation": ""
+    },
+    {
+      "source": "Browse...",
+      "category": "descriptions",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 20,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "C4D",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "C:\\Users\\liuwenbo\\AppData\\Roaming\\rizomuv\\CommandLog.lua",
+      "category": "review_internal",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 56,
+      "translation": ""
+    },
+    {
+      "source": "Can run releases built before: -1--1-01",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 39,
+      "translation": ""
+    },
+    {
+      "source": "Cancel Current Config Edition$$Revert the hotkey and mouse interaction configuration to the state they had when the dialog has been opened.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 139,
+      "translation": ""
+    },
+    {
+      "source": "Center All$$Center View on All",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 30,
+      "translation": ""
+    },
+    {
+      "source": "Center Selection$$Center View on the selection set.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 51,
+      "translation": ""
+    },
+    {
+      "source": "CHANGE LICENSE FILE...",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 22,
+      "translation": ""
+    },
+    {
+      "source": "Children Count Display Limit$$Limit the children number displayed into the explorer tree to mitigate display update slowness in presence of large island count",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 158,
+      "translation": ""
+    },
+    {
+      "source": "Clear Log$$Clear log text",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 25,
+      "translation": ""
+    },
+    {
+      "source": "Clear Script$$Clear the script",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 30,
+      "translation": ""
+    },
+    {
+      "source": "Clear$$Clear current selection",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 30,
+      "translation": ""
+    },
+    {
+      "source": "Close Exporter Dialog$$Close the exported dialog.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 49,
+      "translation": ""
+    },
+    {
+      "source": "Color Map and Selection Bar$$The color map an selection bar shows relation between the viewport polygon's color and various numerical values, and allows to select islands and primitives.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 186,
+      "translation": ""
+    },
+    {
+      "source": "Command Log",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Compress in LZW$$Compress the Tiff file in LZW format",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 53,
+      "translation": ""
+    },
+    {
+      "source": "Compress TIFF images",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Constrain Edge(s) Horizontally$$Constrain the selected edges to be horizontal when unfolding and optimizing. You need to update optimize to see the effects.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 156,
+      "translation": ""
+    },
+    {
+      "source": "Constrain Edge(s) Vertically$$Constrain the selected edges to be vertical when unfolding and optimizing. You need to update optimize to see the effects.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 152,
+      "translation": ""
+    },
+    {
+      "source": "Context menu",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "COPY",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 4,
+      "translation": ""
+    },
+    {
+      "source": "Copy Host ID To Clipboard$$Copy Host ID text to clipboard so that you will not make mistake when pasting it in the website when (re)generating your license file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 161,
+      "translation": ""
+    },
+    {
+      "source": "Cropped File Path$$Cropped OBJ file path",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "Cropping Box Dimensions File",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 28,
+      "translation": ""
+    },
+    {
+      "source": "Cropping Box Input$$",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Cropping Boxes",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Alt-E",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 23,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Alt-O",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 20,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Alt-S",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-DLMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-DMMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-F1",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-F11",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-F2",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-F3",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-K-LMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-LMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-A",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-H",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-O",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 20,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-PageUp",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-R",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 20,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-S",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 20,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-V",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-W",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Shift-Z",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Space-LMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Space-MMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Ctrl-Space-RMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Current Set",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 51,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Custom File Path Enabled$$Use a custom file path pattern.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 57,
+      "translation": ""
+    },
+    {
+      "source": "Custom Planar",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Custom Tex",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "CUSTOMIZE",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Cut$$Use in edge, polygon mode to create seams on the mesh. If the selection is empty, the edge located under the mouse pointer will be cut.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 140,
+      "translation": ""
+    },
+    {
+      "source": "D-LMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "D-MMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "D-RMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "Data Explorer$$",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Data Tree",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Debug log file",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Debug Log File Path$$The debug command log file contains useful information that can be used to fix issues.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 107,
+      "translation": ""
+    },
+    {
+      "source": "Debug$$Expand Debug panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 25,
+      "translation": ""
+    },
+    {
+      "source": "default",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 120,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Default Values$$Expand Default Values panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 43,
+      "translation": ""
+    },
+    {
+      "source": "DEL",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Delete Unused UV Sets$$If enabled, UV sets that have zero flattened polygons won't be exported in the file. In presence of multiple UV sets, if such a completely not flattened UV set would be located in the first UV set, the second UV set (flattened) will be placed in the first one!",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 283,
+      "translation": ""
+    },
+    {
+      "source": "Density$$Switch to edit mode density multiplier map. Once edited, a value of the density multiplier different from zero will change the UV polygon's area after running optimize. Packing will also take account the density multiplier map by giving island different scales, and hotspot will do as well.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 299,
+      "translation": ""
+    },
+    {
+      "source": "Deselect element",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Deselect group content",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 22,
+      "translation": ""
+    },
+    {
+      "source": "Deselect path",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Deselect tile",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in New Groups Using Group File Data$$Distribute islands in new groups  by group ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 94,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in New Groups Using Material File Data$$Distribute islands in new groups by material ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 99,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in New Groups Using Object File Data$$Distribute islands in new groups by object ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 95,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in New Groups Using Smoothing File Data$$Distribute islands in new groups by smoothing groups ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 108,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in Tiles Using Group File Data$$Distribute islands in available tiles by group ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 93,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in Tiles Using Material File Data$$Distribute islands in available tiles by material ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 99,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in Tiles Using Object File Data$$Distribute islands in available tiles by object ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 95,
+      "translation": ""
+    },
+    {
+      "source": "Distribute in Tiles Using Smoothing Group File Data$$Distribute islands in available tiles by smoothing groups ID.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 114,
+      "translation": ""
+    },
+    {
+      "source": "Distribute locked islands",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 25,
+      "translation": ""
+    },
+    {
+      "source": "Distribute Locked Islands$$Distribute islands even if they are located into locked tiles or locked groups or if they are locked.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 128,
+      "translation": ""
+    },
+    {
+      "source": "DLMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 4,
+      "translation": ""
+    },
+    {
+      "source": "DMMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 4,
+      "translation": ""
+    },
+    {
+      "source": "dpi",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Drag$$Switch to edit mode drag",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 30,
+      "translation": ""
+    },
+    {
+      "source": "DXF Borders File Path$$The path of the file used to export the boundary edges of the islands",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 92,
+      "translation": ""
+    },
+    {
+      "source": "Edge Based Symmetry Detection$$Set the symmetry map using the current edge selection (only on edge must be selected). Only the mesh topology is read, the 3D coordinates are ignored.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 181,
+      "translation": ""
+    },
+    {
+      "source": "Edge Based Symmetry Detection$Shift-S$Set the symmetry map using the current edge selection (only on edge must be selected). Only the mesh topology is read, the 3D coordinates are ignored.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 188,
+      "translation": ""
+    },
+    {
+      "source": "Edge Padding Size Channel A$$Edge padding duplicates the pixels along the inside of the UV edge and spreads those colors outward, forming a skirt of similar colors.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 164,
+      "translation": ""
+    },
+    {
+      "source": "Edge Padding Size Channel B$$Edge padding duplicates the pixels along the inside of the UV edge and spreads those colors outward, forming a skirt of similar colors.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 164,
+      "translation": ""
+    },
+    {
+      "source": "Edge Rendering Color Channel A$$Edge rendering color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 52,
+      "translation": ""
+    },
+    {
+      "source": "Edge Rendering Color Channel B$$Edge rendering color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 52,
+      "translation": ""
+    },
+    {
+      "source": "Edge Rendering Mode Channel A$$Edge rendering mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 50,
+      "translation": ""
+    },
+    {
+      "source": "Edge Rendering Mode Channel B$$Edge rendering mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 50,
+      "translation": ""
+    },
+    {
+      "source": "Edge$$Lets you select and work at edge level",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 44,
+      "translation": ""
+    },
+    {
+      "source": "EDGES",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 600,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "Email account: ",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Enable Auto Deselected After isolate$$If enabled, island will be automatically deselected after an isolate action",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 113,
+      "translation": ""
+    },
+    {
+      "source": "Enable Partial UV Sets$$If enabled, non flat polygons and their associated UV nodes will not be exported. Warning: this options may not be compatible with all 3D Software.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 171,
+      "translation": ""
+    },
+    {
+      "source": "Enable wheel",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Enable/Disable$$Enable/Disable symmetry mode for selection, unfolding and edition",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 81,
+      "translation": ""
+    },
+    {
+      "source": "Enabled Auto Save$$Auto save feature save your current project into FBX file regularly.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 87,
+      "translation": ""
+    },
+    {
+      "source": "Execute Now",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Execute Script$$Execute current script",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Execute Selected",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Execute Selected Script$$Execute the selected part of the script",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 64,
+      "translation": ""
+    },
+    {
+      "source": "Expiration Date: ",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Export Borders in DXF$$Exports the boundaries as LWPOLYLINEs in a DXF file. Current scene units are used to specify the DXF units. Scene units are set from the input file or set to 'cm' as default. If you need to set the file unit, open the UV Set panel and use the Scene unit controller.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 288,
+      "translation": ""
+    },
+    {
+      "source": "Export Borders Only Channel A$$Export UV mesh borders only in the tiff file",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 75,
+      "translation": ""
+    },
+    {
+      "source": "Export Borders Only Channel B$$Export UV mesh borders only in the tiff file",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 75,
+      "translation": ""
+    },
+    {
+      "source": "Export Box Info$$Export cropped box/tile dimensions in a text file",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 66,
+      "translation": ""
+    },
+    {
+      "source": "Export Channel A$$Enable export of rasterized UV in a image file using channel A's settings",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 91,
+      "translation": ""
+    },
+    {
+      "source": "Export Channel B$$Enable export of rasterized UV in a image file using channel B's settings",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 91,
+      "translation": ""
+    },
+    {
+      "source": "Export Cropped$$Export Cropped file",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 35,
+      "translation": ""
+    },
+    {
+      "source": "Export Current Config to File$$Export the hotkey and mouse interaction current configuration into a file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 105,
+      "translation": ""
+    },
+    {
+      "source": "Export Files$$Export files using current settings.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 50,
+      "translation": ""
+    },
+    {
+      "source": "Export RizomUV attributes",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 25,
+      "translation": ""
+    },
+    {
+      "source": "Export Tile Shape in DXF$$Export Tile shape as an additional poly line in the DXF File",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 86,
+      "translation": ""
+    },
+    {
+      "source": "Export Tile Shape in Quad$$Export Tile shape as a Quad in the OBJ File",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 70,
+      "translation": ""
+    },
+    {
+      "source": "Export UV in 3D$$Export UV space in the 3D space of the OBJ File",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 64,
+      "translation": ""
+    },
+    {
+      "source": "Exporter$$The exporter ",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 23,
+      "translation": ""
+    },
+    {
+      "source": "EXTEND",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 6,
+      "translation": ""
+    },
+    {
+      "source": "Extend License$$Show this license into license account page using the default web browser",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 89,
+      "translation": ""
+    },
+    {
+      "source": "External Text Editor$$Your favorite text and script editor program path.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 72,
+      "translation": ""
+    },
+    {
+      "source": "External text scripting editor",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 30,
+      "translation": ""
+    },
+    {
+      "source": "F1",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 19,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "F10",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "F11",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "F12",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "F2",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 19,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "F3",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 19,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "F4",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 19,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "F6",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "F7",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "F8",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "F9",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 31,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "Far plane",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "FBX compatibility version",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 20,
+      "length": 25,
+      "translation": ""
+    },
+    {
+      "source": "FBX Compatibility Version$$FBX compatibility version chosen at import and export.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 81,
+      "translation": ""
+    },
+    {
+      "source": "FBX delete unused UV sets",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 22,
+      "length": 25,
+      "translation": ""
+    },
+    {
+      "source": "FBX enable partial UV sets",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 22,
+      "length": 26,
+      "translation": ""
+    },
+    {
+      "source": "FBX order UV sets by their name",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 22,
+      "length": 31,
+      "translation": ""
+    },
+    {
+      "source": "File amount",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "File Browser$$Display a file browser that enables you to select a file path and name for saving your data.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 106,
+      "translation": ""
+    },
+    {
+      "source": "File Browser$$Show a file selector that allows to select a file name.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 69,
+      "translation": ""
+    },
+    {
+      "source": "File Format Channel A$$File Format For Channel A",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 48,
+      "translation": ""
+    },
+    {
+      "source": "File Format Channel B$$File Format For Channel A",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 48,
+      "translation": ""
+    },
+    {
+      "source": "File Path",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "File Path Channel A$$Channel A file path",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "File Path Channel B$$Channel A file path",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "File suffix added when saving",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 29,
+      "translation": ""
+    },
+    {
+      "source": "Filling Direction$$Filling direction when distributing selected group into the grid.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 84,
+      "translation": ""
+    },
+    {
+      "source": "Fit$$Rescale selected islands to fit the UV Square (without deforming them)",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 75,
+      "translation": ""
+    },
+    {
+      "source": "Foreground color",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Front and Back",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Front Only",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Front Shaded / Back Solid Color",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 31,
+      "translation": ""
+    },
+    {
+      "source": "Geometry Based$$Expand Geometry Based panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 43,
+      "translation": ""
+    },
+    {
+      "source": "Global UI",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 37,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Global UI$$Expand Global UI panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 33,
+      "translation": ""
+    },
+    {
+      "source": "Grid texture path",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Grid Texture Path$$The path of the tile texture which is displayed when the texture mode is set to Texture Grid. Clear text to revert the built-in numerated grid texture.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 170,
+      "translation": ""
+    },
+    {
+      "source": "Group Overlapped$$Detect overlapped island sets and create groups for all of them.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 82,
+      "translation": ""
+    },
+    {
+      "source": "Group$$Create a new elastic group using the current island/group selection. An elastic groups adapt its shape to the size of its content.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 137,
+      "translation": ""
+    },
+    {
+      "source": "Groups to Tiles Distribution Options",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 36,
+      "translation": ""
+    },
+    {
+      "source": "Grow $$Grow polygon/edge/point selection",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "Height$$Image height",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Hidden: 0",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 400,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Hide Selected/Hovered Island(s)$$Hide selected islands or the island under the mouse.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 85,
+      "translation": ""
+    },
+    {
+      "source": "Horizontalize$$Aligns selected edges or points on a horizontal axis",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 67,
+      "translation": ""
+    },
+    {
+      "source": "Hotspot Mapping$$Transform selected islands and groups to fit the available Trims, based on their geometry. Please note that you can hover over an island at any time and press 'S' to hotspot it, even when you're in a mode other than the island selection mode.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 259,
+      "translation": ""
+    },
+    {
+      "source": "HUD text",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "HUD Text$$Text color of the HUD displaying texel density information.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 69,
+      "translation": ""
+    },
+    {
+      "source": "Import and Export island groups, island properties, pin map and edge constrains.",
+      "category": "descriptions",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 18,
+      "length": 80,
+      "translation": ""
+    },
+    {
+      "source": "Import and Export RizomUV attributes$$Import and export island groups, island properties, pin map, and edge constrains from and to files.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 137,
+      "translation": ""
+    },
+    {
+      "source": "Import Auto Weld$$Automatically weld UV edges that are perfectly superposed and sharing the same original edge in 3D space. This feature should be activated especially when all your UV polygons are separated after importing the file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 233,
+      "translation": ""
+    },
+    {
+      "source": "Import Current Config from File$$Import the hotkey and mouse interaction configuration from a file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 99,
+      "translation": ""
+    },
+    {
+      "source": "Import Export",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 37,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Import Export$$Expand Import Export panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 41,
+      "translation": ""
+    },
+    {
+      "source": "Import User Normals$$Import user normals from model files. If unchecked normals will be replaced by polygon's geo-normals.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 122,
+      "translation": ""
+    },
+    {
+      "source": "Import user normals.",
+      "category": "descriptions",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 18,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Import weld superposed UV edges",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 18,
+      "length": 31,
+      "translation": ""
+    },
+    {
+      "source": "Import...",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "In New Groups",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "In Tiles",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Invert wheel",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Invert zoom drag direction",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 26,
+      "translation": ""
+    },
+    {
+      "source": "Island and Groups$$Lets you select and work with islands, groups, tiles and trims",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 81,
+      "translation": ""
+    },
+    {
+      "source": "Island borders",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 14,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Island visibility",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "jpg",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "K-LMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "Language:",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Layout FullScreen 3D$$FullScreen 3D",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 35,
+      "translation": ""
+    },
+    {
+      "source": "Layout FullScreen UV$$FullScreen UV",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 35,
+      "translation": ""
+    },
+    {
+      "source": "License File Browser$$Open directory browser to set the license file",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 68,
+      "translation": ""
+    },
+    {
+      "source": "LICENSE ID",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "LICENSE LOCATION",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "License Manager$$This feature enables you to comprehensively manage your license. It provides visibility into various details such as the license ID, licensee, expiration date of the rental license, and the status of both the rental and perpetual licenses.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 256,
+      "translation": ""
+    },
+    {
+      "source": "LICENSEE",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Lighting$$Enable/Disable Lighting",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 33,
+      "translation": ""
+    },
+    {
+      "source": "List Assigned Features$$List the features that have a hotkey assigned",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 69,
+      "translation": ""
+    },
+    {
+      "source": "LMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Load User Texture Map...$Ctrl-T$Load a texture from an image file (used in both viewports shading)",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 98,
+      "translation": ""
+    },
+    {
+      "source": "Local mode",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Local$$Enable/Disable symmetry local mode. When enabled, symmetric islands will remain at their place while their symmetric counterparts are translated.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 152,
+      "translation": ""
+    },
+    {
+      "source": "Lock$$Forbid island or group transformation for the packing algorithm.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 70,
+      "translation": ""
+    },
+    {
+      "source": "Long Press Delay",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Long Press Delay$$Number of milliseconds before the popup window appears when a button is long - pressed.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 105,
+      "translation": ""
+    },
+    {
+      "source": "Low Part Background Color$$3D viewport low part gradient color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 62,
+      "translation": ""
+    },
+    {
+      "source": "Lua",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Luminant texture",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 11,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Luminant Texture$$Enable/Disable luminant texture. When enabled the texture becomes unaffected by lighting and shading",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 118,
+      "translation": ""
+    },
+    {
+      "source": "Maximum column count",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Menu's recent file list ignore UV data",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 18,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Mesh Bounding Box Center",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 24,
+      "translation": ""
+    },
+    {
+      "source": "Mesh Export Settings",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Mesh Wire Color$$Mesh wire color when polygons are not displayed",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 64,
+      "translation": ""
+    },
+    {
+      "source": "Mesh Wire Over Poly Color$$Mesh wire color when polygons are displayed and the edge is the primitive selection mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 115,
+      "translation": ""
+    },
+    {
+      "source": "Mesh Wire Over Polys Color$$Mesh wire color when polygons are displayed",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 71,
+      "translation": ""
+    },
+    {
+      "source": "Mirror position",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Miscellaneous$$Expand Miscellaneous panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 41,
+      "translation": ""
+    },
+    {
+      "source": "Mouse Centered",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Mouse Interaction Model Preset$$Mouse interaction model preset",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 62,
+      "translation": ""
+    },
+    {
+      "source": "Multi threading$$Enable or disable multi threading",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 50,
+      "translation": ""
+    },
+    {
+      "source": "Multi UV Sets",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 51,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Near plane",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Neutral 1.0",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 93,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "New: Right click on a controller's to set its default value based on its current state.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 87,
+      "translation": ""
+    },
+    {
+      "source": "no data     (no data)",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "Non-Empty Tiles",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Normalize Tile For Exported File$$Normalize exported UVs to fit the shape of an unity square.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 93,
+      "translation": ""
+    },
+    {
+      "source": "Normalize Tile For UV In 3D$$Normalize UV in 3D file so that current tile will lie have a shape of a unity square.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 114,
+      "translation": ""
+    },
+    {
+      "source": "Not compatible with all DCCs",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 28,
+      "translation": ""
+    },
+    {
+      "source": "Note that the primitive selection mode has an impact on the selection behavior. In primitive edge selection mode, this dialog will select the polygon set's borders, not the edges that are included in them.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 205,
+      "translation": ""
+    },
+    {
+      "source": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 34,
+      "translation": ""
+    },
+    {
+      "source": "Obj File",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "OK",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "Omniverse Browser$$Show a file browser that allows to select a file on Omniverse.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 81,
+      "translation": ""
+    },
+    {
+      "source": "Omniverse client log level (restart needed)",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 43,
+      "translation": ""
+    },
+    {
+      "source": "Omniverse Client Log Level$$Control the verbose level of the NVidia Omniverse service.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 86,
+      "translation": ""
+    },
+    {
+      "source": "OMP Threading",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Open Debug Log File Path Location$$Open the debug log file folder using the file explorer.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 90,
+      "translation": ""
+    },
+    {
+      "source": "Optimize Iterations",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 19,
+      "translation": ""
+    },
+    {
+      "source": "Optimize$$Running Optimize on a flattened geometry will decrease distortion even more in most cases and on most islands. Depending of your primitive selection mode, this option optimizes your flattened islands, depending on whether they are selected, have a mouse-over, or consist of a single island selection",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 309,
+      "translation": ""
+    },
+    {
+      "source": "Optimize$$Switch to edit mode brush optimize ",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 45,
+      "translation": ""
+    },
+    {
+      "source": "OR RESET SERVER LOCATION",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 24,
+      "translation": ""
+    },
+    {
+      "source": "Orbit mode",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Order UV Set by Names$$Group all object's UV sets using their names. If disabled, they will grouped using their channel index",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 125,
+      "translation": ""
+    },
+    {
+      "source": "Other options",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Output File Path Pattern",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 24,
+      "translation": ""
+    },
+    {
+      "source": "Output File Path$$Output file path.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 35,
+      "translation": ""
+    },
+    {
+      "source": "Output File(s) Path$$Output file(s) path",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "Pack after distribute",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "Pack After Distribute$$Run the packing algorithm for all tiles in which islands have been added.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 96,
+      "translation": ""
+    },
+    {
+      "source": "Pack Translate$$Packs selected or all islands if none are selected, but keeps their current orientation and scale",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 113,
+      "translation": ""
+    },
+    {
+      "source": "Pack$$Packs selected, or all islands if none are selected",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 57,
+      "translation": ""
+    },
+    {
+      "source": "Pan",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Parallelize Edges$$Transform selected groups of edges so that they become parallel.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 83,
+      "translation": ""
+    },
+    {
+      "source": "PERPETUAL LICENSE",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Perspective$$Switch from perspective mode to orthographic mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 62,
+      "translation": ""
+    },
+    {
+      "source": "Pick Texel Density$$Using the Pick Texel Density eyedropper picks the Texel Density from the current selection. If nothing is selected, RizomUV calculates the average Texel Density of all visible islands. You can also set your Texel Density manually in the spinner-field next to the eyedropper.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 294,
+      "translation": ""
+    },
+    {
+      "source": "Pin$$Pin Selected point(s) or edge(s) or face(s)",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 48,
+      "translation": ""
+    },
+    {
+      "source": "Pin$$Switch to edit mode brush pin map. The map influence unfold and optimize algorithms. The more the vertexes are dark, the less they will be moved.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 150,
+      "translation": ""
+    },
+    {
+      "source": "Pinch$$Switch to edit mode pinch",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 32,
+      "translation": ""
+    },
+    {
+      "source": "Pinned Color$$Color of pinned elements",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Pinned Vertex",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Plane definition",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Plane orientation",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Plane position",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "png",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Point tolerance",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Polygon Filling Color Channel A$$Polygon color when Color polygon color mode is selected",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 88,
+      "translation": ""
+    },
+    {
+      "source": "Polygon Filling Color Channel B$$Polygon color when Color polygon color mode is selected",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 88,
+      "translation": ""
+    },
+    {
+      "source": "Polygon Filling Mode Channel A$$Polygon rendering mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 54,
+      "translation": ""
+    },
+    {
+      "source": "Polygon Filling Mode Channel B$$Polygon rendering mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 54,
+      "translation": ""
+    },
+    {
+      "source": "Polygon Groups$$The Polygon Groups dialog allows you to select and distribute islands based on object, material, group, or smoothing group present in the model file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 165,
+      "translation": ""
+    },
+    {
+      "source": "Polygon$$Lets you select and work at polygon level",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 50,
+      "translation": ""
+    },
+    {
+      "source": "Preference Tab Focus$$Select which tab is currently displayed in the preference window",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 18,
+      "length": 86,
+      "translation": ""
+    },
+    {
+      "source": "Preferences Anti Aliasing Disabled$$Anti aliasing in viewports disabled",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 71,
+      "translation": ""
+    },
+    {
+      "source": "Preferences Enable Anti Aliasing$$Activate anti aliasing in viewports",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 69,
+      "translation": ""
+    },
+    {
+      "source": "Preferences Far Plane$$Viewport far plane distance from camera",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 62,
+      "translation": ""
+    },
+    {
+      "source": "Preferences File Name Suffix$$Optional file suffix automatically added when saving file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 88,
+      "translation": ""
+    },
+    {
+      "source": "Preferences Near Plane$$Near plane clipping distance to eye. Lowest values can create artifacts (z-fighting)",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 108,
+      "translation": ""
+    },
+    {
+      "source": "Preferences Reset All$$Revert all preferences, layouts, color settings, brush configurations, and other customizations to their factory values.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 143,
+      "translation": ""
+    },
+    {
+      "source": "Preferences Undo History Size$$Number of undo steps",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 51,
+      "translation": ""
+    },
+    {
+      "source": "Preferences$$",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Print Resolution",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Print Resolution Unit$$Print resolution unit",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 44,
+      "translation": ""
+    },
+    {
+      "source": "Print Resolution$$Print resolution",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 34,
+      "translation": ""
+    },
+    {
+      "source": "Protect$$Switch to edit mode paint protect/attract map. This map influence the shortest path selection, and also prevent AutoSeams to select edges.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 147,
+      "translation": ""
+    },
+    {
+      "source": "ps",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "px/cm",
+      "category": "review_internal",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "px/mm",
+      "category": "review_internal",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "Ratio Mode$$Image W&&H ratio linking mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 41,
+      "translation": ""
+    },
+    {
+      "source": "Re-execute Selected Log Text$$Re-execute the selected part of the log",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 69,
+      "translation": ""
+    },
+    {
+      "source": "Recent file list open 3D data only$$When enabled, loading a file using the Recent file list (see menu File) will ignore the UV data present in the file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 152,
+      "translation": ""
+    },
+    {
+      "source": "Rectangularize Polygons Horizontally$$Make the selected polygons rectangular then orient the result horizontally",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 112,
+      "translation": ""
+    },
+    {
+      "source": "Rectangularize Polygons Vertically$$Make the selected polygons rectangular then orient the result vertically",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 108,
+      "translation": ""
+    },
+    {
+      "source": "Rectangularize Polygons$$Make the selected polygons rectangular",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 63,
+      "translation": ""
+    },
+    {
+      "source": "Redo none",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 22,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Remote Control File",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 19,
+      "translation": ""
+    },
+    {
+      "source": "Remote Control File Enabled$$Activate the remote control by file. Once activated, RizomUV will execute the commands in the file each time the file's date is modified.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 166,
+      "translation": ""
+    },
+    {
+      "source": "Remote Control File Path$$Remote control script file path.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 58,
+      "translation": ""
+    },
+    {
+      "source": "RENTING LICENSE",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Repeat Last Action$$Repeat last action on the current selection set.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 68,
+      "translation": ""
+    },
+    {
+      "source": "Repeat Last Two Actions$$Repeat the last two actions on the current selection set.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 82,
+      "translation": ""
+    },
+    {
+      "source": "Reset All",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 19,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Reset all Hotkeys to Built-in$$Revert all hotkeys to their built-in values.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 75,
+      "translation": ""
+    },
+    {
+      "source": "Reset License Location$$Reset the license location so that the license activation is shown at next start.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 105,
+      "translation": ""
+    },
+    {
+      "source": "Revert all Hotkeys to Saved$$Revert all hotkeys to the state they had when the dialog has been opened.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 102,
+      "translation": ""
+    },
+    {
+      "source": "Rhino3D",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "RIZOM-LAB ACCOUNT",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "RizomUV",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "RizomUV Legacy",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "RMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Rotate 180 Degrees$$Rotate selection by 180 degrees.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 52,
+      "translation": ""
+    },
+    {
+      "source": "Rotate 90 ClockWise$$Rotate selection by 90 degrees clock wise.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 63,
+      "translation": ""
+    },
+    {
+      "source": "Rotate 90 CounterClockWise$$Rotate selection by 90 degrees counter clock wise.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 78,
+      "translation": ""
+    },
+    {
+      "source": "Rotate island",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Ruler Color$$Ruler color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 24,
+      "translation": ""
+    },
+    {
+      "source": "Run ",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 4,
+      "translation": ""
+    },
+    {
+      "source": "Save Current Config for Next Sessions$$Save the hotkey and mouse interaction configuration into the preference file for next session.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 133,
+      "translation": ""
+    },
+    {
+      "source": "Save File$$Save model in a file.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 32,
+      "translation": ""
+    },
+    {
+      "source": "Save$$RizomUV can export various file formats such as universal scene description (USD), Autodesk FBX, and OBJ files.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 117,
+      "translation": ""
+    },
+    {
+      "source": "Scale island",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Script and Log$$",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Script Language$$Select in which language the script in the editor should be interpreted",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 88,
+      "translation": ""
+    },
+    {
+      "source": "Script Log Window$$Show script and log window.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 46,
+      "translation": ""
+    },
+    {
+      "source": "Script Path",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Seams Color$$Seams color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 24,
+      "translation": ""
+    },
+    {
+      "source": "See Selection Through$$Makes the edge selection visible behind the polygons",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 75,
+      "translation": ""
+    },
+    {
+      "source": "See through polygons",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 11,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Select  Rotate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Select  Scale",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Select  Translate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Select & Rotate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Select & Scale",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Select & Translate",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 18,
+      "translation": ""
+    },
+    {
+      "source": "Select All$$Select all",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 22,
+      "translation": ""
+    },
+    {
+      "source": "Select Borders$$Select points or edges located on selection's island borders. If some edges are selected on the borders, only the border that have some edges selected will be selected, same for vertexes",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 202,
+      "translation": ""
+    },
+    {
+      "source": "Select Edge Loop$$Switch to edge loop selection tool as primary too",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 67,
+      "translation": ""
+    },
+    {
+      "source": "Select element",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Select group content",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "Select loop",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Select Loops$$Selects a run of loops starting from your current edge selection",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 78,
+      "translation": ""
+    },
+    {
+      "source": "Select Overlaps$$Selects overlapping polygons. In Island Mode (F4) it will select islands which have at least one triangle overlapping other triangles",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 150,
+      "translation": ""
+    },
+    {
+      "source": "Select Parallel$$Select Parallel Edges",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Select Shortest Path$$Switch to shortest path edge selection as primary tool",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 76,
+      "translation": ""
+    },
+    {
+      "source": "Select Similar$$Provided that your islands are similar enough, Select Similar copies your selection across islands with the same topology. As of version 2020.1.100, this also includes islands, the selection process is no longer limited to edges.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 245,
+      "translation": ""
+    },
+    {
+      "source": "Select tile",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Select$$Switch to edit mode selection (TIP: Press TAB for rapid access to Trans/Rot/Scal Gizmo)",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 95,
+      "translation": ""
+    },
+    {
+      "source": "Selected Tiles",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Selected: 0",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 400,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Selection Color$$Color of selected elements",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 43,
+      "translation": ""
+    },
+    {
+      "source": "Shift-Alt-H",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 17,
+      "length": 11,
+      "translation": ""
+    },
+    {
+      "source": "Shift-Ctrl-DLMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Shift-Ctrl-DMMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Shift-Ctrl-G",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Shift-Ctrl-K-LMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Shift-Ctrl-LMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Shift-F1",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Shift-F2",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Shift-F3",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Shift-LMB",
+      "category": "ignored_shortcuts_numbers",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Shortest path preview",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "Show All Islands$$Show all islands",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 34,
+      "translation": ""
+    },
+    {
+      "source": "Show Borders$$Switch on/off borders/seams visibility. Be careful when disabled, you will not see the effect of cut operations, which can be error prone.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 152,
+      "translation": ""
+    },
+    {
+      "source": "Show Both$$Show flat and not flat islands.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 42,
+      "translation": ""
+    },
+    {
+      "source": "Show Dialog...$$Show / Hide the symmetry dialog.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 48,
+      "translation": ""
+    },
+    {
+      "source": "Show Flats$$Show flat islands",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 29,
+      "translation": ""
+    },
+    {
+      "source": "Show in Explorer",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 14,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Show Not Flats$$Show not flat islands (i.e: islands that are not yet unfolded)",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 78,
+      "translation": ""
+    },
+    {
+      "source": "Show the hotkeys settings$$Expand Show the hotkeys settings panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 65,
+      "translation": ""
+    },
+    {
+      "source": "SHOW THIS LICENSE IN RIZOM-LAB ACCOUNT",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Show Viewport Interaction$$Expand Show Viewport Interaction panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 65,
+      "translation": ""
+    },
+    {
+      "source": "Shows FBX Settings Dialog$$Shows FBX settings when using 'Load As' and 'Save As' features",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 89,
+      "translation": ""
+    },
+    {
+      "source": "Shows FBX settings when using 'Load As' and 'Save As'",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 18,
+      "length": 53,
+      "translation": ""
+    },
+    {
+      "source": "Shrink$$Shrink polygon/edge/point selection",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 43,
+      "translation": ""
+    },
+    {
+      "source": "Small",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "Smoothing Groups",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Sort by hotkey",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 14,
+      "translation": ""
+    },
+    {
+      "source": "Sort by name",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Sort by zone",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Sort Mode$$Feature sort mode",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 28,
+      "translation": ""
+    },
+    {
+      "source": "Space-LMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Space-MMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Space-RMB",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Spread$$Switch to edit mode spread",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 34,
+      "translation": ""
+    },
+    {
+      "source": "Squarify$$Rescale selected Islands to fit the UV Square. PLEASE NOTE: Squarify may cause the islands to be slightly deformed. This happens as Squarify fit the islands into both UV tile dimensions",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 195,
+      "translation": ""
+    },
+    {
+      "source": "Stack and Group Similar$$Stack and Group Similar copies the seams and UV coordinates of the islands into a stack, provided their similarity matches your criteria.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 162,
+      "translation": ""
+    },
+    {
+      "source": "Stack Similar$$Stack Similar copies the seams and the UV coordinates of the islands so they form a stack, provided that they have sufficient similarity.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 152,
+      "translation": ""
+    },
+    {
+      "source": "Status: OK",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Straighten$$Straighten selected points or edges",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 47,
+      "translation": ""
+    },
+    {
+      "source": "Switch UV and 3D Viewport$$Switch UV and 3D viewport visibility",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 63,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry B.Box Center$$Set the axis plane position to the object bounding box, or bounding box of the current selection",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 119,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry Mode$$Topology Based|Geometry Based",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 44,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry UV Space Axis Position$$UV space axis position",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 55,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry Vertex Tolerance$$Threshold distance value for symmetry detection",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 74,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry World Origin$$Set the axis plane position to the world origin",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 70,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry XY$$Set the symmetry plane orientation to XY",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 53,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry YZ$$Set the symmetry plane orientation to YZ",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 53,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry ZX$$Set the symmetry plane orientation to ZX",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 53,
+      "translation": ""
+    },
+    {
+      "source": "Symmetry$$",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Text size",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Text Size$$Rendered text size in pixel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Texture Scaling",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 51,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "THIS COMPUTER HOST ID",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "This release build date: 2025-10-1",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 34,
+      "translation": ""
+    },
+    {
+      "source": "tiff",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 4,
+      "translation": ""
+    },
+    {
+      "source": "Tile Color$$Tile color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 22,
+      "translation": ""
+    },
+    {
+      "source": "Tile Shape",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 10,
+      "translation": ""
+    },
+    {
+      "source": "Tile Texture File Browser$$Opens a file selector to select a program file name.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 79,
+      "translation": ""
+    },
+    {
+      "source": "TIP: In primitive edge selection mode, this dialog will select the polygon set's borders, not the edges that are included in them.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 130,
+      "translation": ""
+    },
+    {
+      "source": "To change or create an hotkey please follow the instructions:",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 61,
+      "translation": ""
+    },
+    {
+      "source": "Toggle Isolate Selected/Hovered Island(s)$$Isolate selected islands or the island under the mouse. If nothing is selected, this will make visible all islands, excluding the ones that have been hidden using \"Hide Selected\". ",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 223,
+      "translation": ""
+    },
+    {
+      "source": "Topology Based$$Expand Topology Based panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 43,
+      "translation": ""
+    },
+    {
+      "source": "Total: 0",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 400,
+      "length": 8,
+      "translation": ""
+    },
+    {
+      "source": "Transform Gizmo",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 15,
+      "translation": ""
+    },
+    {
+      "source": "Transform Gizmo$$Transform gizmo's color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "Transform$$Show transform tool when selection is non-empty (Hit TAB key to display the tool whenever this button is down or not).",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 129,
+      "translation": ""
+    },
+    {
+      "source": "Translate island",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "U...1...STANDALONE...W...2025...0...104...master...ETHERNET=e88088795de7,ETHERNET=00ff73b0c037,ETHERNET=d4d85333c192,HOSTNAME=LAPTOP-S8HJE1A8...9325",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 148,
+      "translation": ""
+    },
+    {
+      "source": "UDIMs",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 51,
+      "length": 5,
+      "translation": ""
+    },
+    {
+      "source": "UI Background Color$$UI background color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "UI Foreground Foreground  Color$$UI foreground color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 52,
+      "translation": ""
+    },
+    {
+      "source": "UI Scaling$$Main UI and panels size scaling factor",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 50,
+      "translation": ""
+    },
+    {
+      "source": "Unconstrain Edge(s)$$Removes constrains on edges. On all edges if none selected, on the edges included in current primitive selection.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 134,
+      "translation": ""
+    },
+    {
+      "source": "Undo history size",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Undo none",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 10,
+      "length": 9,
+      "translation": ""
+    },
+    {
+      "source": "Undo Select Edge",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 1,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "Undo TaskDataTreeChange",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 17,
+      "length": 23,
+      "translation": ""
+    },
+    {
+      "source": "Unfold Iterations",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Unfold$$Depending of your primitive selection mode, this option unwraps your islands, depending on whether they are selected, have a mouse-over, consist of a single island selection, or islands which have been cut but not flattened yet",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 235,
+      "translation": ""
+    },
+    {
+      "source": "Unfold$$Switch to edit mode brush unfold ",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 41,
+      "translation": ""
+    },
+    {
+      "source": "Ungroup$$Remove selected island/group from their respective group.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 66,
+      "translation": ""
+    },
+    {
+      "source": "UnPin$$Unpins selected point(s). Unpin all points if none selected. Can be also applied on island selection.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 108,
+      "translation": ""
+    },
+    {
+      "source": "Up axis",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Up Part Background Color$$3D viewport up part gradient color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 60,
+      "translation": ""
+    },
+    {
+      "source": "Up Vector$$Orient the view so that the selected vector is Up and use appropriate rotation axises",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 96,
+      "translation": ""
+    },
+    {
+      "source": "Use",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 3,
+      "translation": ""
+    },
+    {
+      "source": "Use edge selection",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 18,
+      "translation": ""
+    },
+    {
+      "source": "Use Tile's Real Space Dimensions$$The exported document size and scaling will reflect the real space dimensions of the UV tile and the content. Enable it when using the exported document as blueprint to create object of the physical world in particular. If disabled, the document will get the dimensions specified in by the Width and Height parameter of the exporter, scaling may occur.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 386,
+      "translation": ""
+    },
+    {
+      "source": "Use tile's real space width and height",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "User texture map",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 16,
+      "translation": ""
+    },
+    {
+      "source": "UV Background",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "UV Background Color$$UV viewport background color ",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 50,
+      "translation": ""
+    },
+    {
+      "source": "UV Grid",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "UV Grid Color$$UV Grid color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 28,
+      "translation": ""
+    },
+    {
+      "source": "UV in 3D File Path$$UV in 3D OBJ file path",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 42,
+      "translation": ""
+    },
+    {
+      "source": "UV in 3D Obj File",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "UV Pixel Grid",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "UV Pixel Grid Color$$UV Pixel Grid color",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 40,
+      "translation": ""
+    },
+    {
+      "source": "UV Snapshot Channel A",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "UV Snapshot Channel B",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 21,
+      "translation": ""
+    },
+    {
+      "source": "UV Snapshot Settings",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 20,
+      "translation": ""
+    },
+    {
+      "source": "UV Space$$Expand UV Space panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 31,
+      "translation": ""
+    },
+    {
+      "source": "Verbose",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 7,
+      "translation": ""
+    },
+    {
+      "source": "Vertex$$Lets you select and work at vertex level",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 48,
+      "translation": ""
+    },
+    {
+      "source": "Verticalize$$Aligns selected edges or points on a vertical axis",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 2,
+      "length": 63,
+      "translation": ""
+    },
+    {
+      "source": "View Centered",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Viewport's Planar",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Viewports$$Expand Viewports panel",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 33,
+      "translation": ""
+    },
+    {
+      "source": "Visit License In Account$$Show this license into license account page using the default web browser.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 100,
+      "translation": ""
+    },
+    {
+      "source": "Visit User Account$$Load licensee's account page into default web browser.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 74,
+      "translation": ""
+    },
+    {
+      "source": "W&H Units$$Image width and height unit",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 16,
+      "length": 38,
+      "translation": ""
+    },
+    {
+      "source": "Watched Nodes",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W",
+        "multiple"
+      ],
+      "occurrences": 6,
+      "length": 13,
+      "translation": ""
+    },
+    {
+      "source": "Weld Island Cut$$Weld Island Cuts will weld these back independently without welding across islands if an island on your model has been given several cuts. It will only weld the cuts on the selected or moused - over island.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 223,
+      "translation": ""
+    },
+    {
+      "source": "Weld Islands$$If you have cut your mesh into several islands, select both sides of the cut, then Weld Islands will weld these back together. Use this when you want to weld specific islands back together and/or want to avoid a reset.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 232,
+      "translation": ""
+    },
+    {
+      "source": "Weld$$Welds selected edges, polygons, or islands. If the selection is empty, the edge or loop located under the mouse pointer, if any, will be welded.",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 150,
+      "translation": ""
+    },
+    {
+      "source": "Width$$Image width",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 10,
+      "length": 18,
+      "translation": ""
+    },
+    {
+      "source": "Wireframe over polygons",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 23,
+      "translation": ""
+    },
+    {
+      "source": "Wireframe over polygons in edge mode",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 13,
+      "length": 36,
+      "translation": ""
+    },
+    {
+      "source": "World Origin",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 12,
+      "translation": ""
+    },
+    {
+      "source": "Write command log",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 17,
+      "translation": ""
+    },
+    {
+      "source": "Write Command Log Into File$$Write command log into file (for debugging purpose)",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 80,
+      "translation": ""
+    },
+    {
+      "source": "Write OpenGL Debug Into File$$Write openGL debug message into file (for debugging purpose)",
+      "category": "tooltips",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 90,
+      "translation": ""
+    },
+    {
+      "source": "Write OpenGL log (restart needed)",
+      "category": "interface_labels",
+      "apis": [
+        "ExtTextOutW",
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 12,
+      "length": 33,
+      "translation": ""
+    },
+    {
+      "source": "XY",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "You can double click on the list items to select them, or use the buttons to select or append the items to the current selection.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 129,
+      "translation": ""
+    },
+    {
+      "source": "You can select multiple groups by holding down the Ctrl key while clicking on the groups, then click on \"In tiles\" or \"In New Groups\" whether you wan to distribute the selected groups in the available tiles or in new groups.",
+      "category": "descriptions",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 4,
+      "length": 224,
+      "translation": ""
+    },
+    {
+      "source": "YZ",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 2,
+      "translation": ""
+    },
+    {
+      "source": "ZBrush",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 8,
+      "length": 6,
+      "translation": ""
+    },
+    {
+      "source": "ZX",
+      "category": "interface_labels",
+      "apis": [
+        "GetTextExtentPoint32W"
+      ],
+      "occurrences": 6,
+      "length": 2,
+      "translation": ""
+    }
+  ],
+  "malformed": []
+}

@@ -1,0 +1,130 @@
+{
+  "$schema": "rizomuv-localizer-exclusions-v1",
+  "description": "运行时与 EXE 静态提取中明确不应进入分发词库的动态数据和代码",
+  "entries": [
+    {
+      "source": "C:\\Users\\liuwenbo\\AppData\\Roaming\\rizomuv\\CommandLog.lua",
+      "reason": "动态用户路径、硬件名称或许可证机器指纹，不得写入分发词库"
+    },
+    {
+      "source": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "reason": "动态用户路径、硬件名称或许可证机器指纹，不得写入分发词库"
+    },
+    {
+      "source": "U...1...STANDALONE...W...2025...0...104...master...ETHERNET=e88088795de7,ETHERNET=00ff73b0c037,ETHERNET=d4d85333c192,HOSTNAME=LAPTOP-S8HJE1A8...9325",
+      "reason": "动态用户路径、硬件名称或许可证机器指纹，不得写入分发词库"
+    },
+    {
+      "source": "#Accuracy double",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Data table",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Data.Maps table",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Deselect bool",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Edges ints",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#File table",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Mode string \"All\"",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Mode string \"Pin\"",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Orientation string",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Resolution int",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Rotate table",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Rotate.Initial int",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Rotate.Max double",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Rotate.Min double",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Rotate.Step double",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Scaling table",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Scaling.Factor double",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Scaling.Max double",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Scaling.Min double",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Scaling.Mode int",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Similars table",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "#Width int",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "App = rizomuv.App()",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "def print(o):",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "Frustum.Update() UV",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "import rizomuv",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "import sys, os.path; sys.path.insert(0, os.path.abspath(os.path.dirname(sys.argv[0])) if sys.argv and os.path.exists(sys.argv[0]) else '')",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    },
+    {
+      "source": "setattr(rizomuv.App, '",
+      "reason": "脚本/API 类型声明或可执行代码，不属于可见界面文字"
+    }
+  ]
+}

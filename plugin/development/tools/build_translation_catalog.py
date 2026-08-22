@@ -77,14 +77,19 @@ def main() -> int:
                 try:
                     record = json.loads(line)
                     text = normalize_source(str(record.get("text", "")))
-                    api = str(record.get("api", "unknown"))
+                    raw_apis = record.get("apis", record.get("api", "unknown"))
+                    if isinstance(raw_apis, list):
+                        record_apis = {str(api) for api in raw_apis}
+                    else:
+                        record_apis = {str(raw_apis)}
+                    count = max(1, int(record.get("count", 1)))
                 except (json.JSONDecodeError, TypeError, ValueError) as error:
                     malformed.append({"file": str(log_path), "line": line_number, "error": str(error)})
                     continue
                 if not text:
                     continue
-                occurrences[text] += 1
-                apis[text].add(api)
+                occurrences[text] += count
+                apis[text].update(record_apis)
 
     grouped: dict[str, list[str]] = defaultdict(list)
     for source in occurrences:

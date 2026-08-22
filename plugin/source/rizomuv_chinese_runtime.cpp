@@ -23,24 +23,44 @@ std::filesystem::path RuntimeDirectory() {
     return std::filesystem::path(std::wstring(path.data(), length)).parent_path();
 }
 
+std::filesystem::path CaptureDirectory() {
+    std::vector<wchar_t> path(32768);
+    const DWORD length = GetEnvironmentVariableW(
+        L"LOCALAPPDATA", path.data(), static_cast<DWORD>(path.size()));
+    if (length > 0 && length < path.size())
+        return std::filesystem::path(std::wstring(path.data(), length)) /
+               L"RizomUVChinese";
+    return RuntimeDirectory();
+}
+
 DWORD WINAPI InitializeLocalizer(void*) {
     using namespace rizomuv::localizer;
     const std::filesystem::path directory = RuntimeDirectory();
-    InitializeRuntimeLog(directory);
+    const std::filesystem::path captureDirectory = CaptureDirectory();
+    InitializeRuntimeLog(captureDirectory);
     RuntimeLog(L"RizomUV 中文运行时开始初始化");
 
     std::wstring error;
-    const std::filesystem::path dictionaryPath = directory / L"translations" / L"ui_zh-CN.json";
+    const std::filesystem::path dictionaryPath = directory / L"ui_zh-CN.json";
     if (!g_dictionary.Load(dictionaryPath, error)) {
         RuntimeLog(L"词库加载失败，保持英文运行：" + error);
         return 1;
     }
     RuntimeLog(L"已加载词条：" + std::to_wstring(g_dictionary.Size()));
 
+    if (StartMissingTextCapture(captureDirectory, error))
+        RuntimeLog(L"漏词采集已启用，输出目录：" + captureDirectory.wstring());
+    else
+        RuntimeLog(L"漏词采集启动失败：" + error);
+
     if (!InstallGdiIatHooks(GetModuleHandleW(nullptr), &g_dictionary, error)) {
         RuntimeLog(L"GDI Hook 安装失败，保持英文运行：" + error);
         return 2;
     }
+    if (StartMenuBarCredits(g_runtimeModule))
+        RuntimeLog(L"Toolbag 风格菜单栏署名已启用");
+    else
+        RuntimeLog(L"Toolbag 风格菜单栏署名启动失败");
 
     // Menus are created during startup. Re-scan briefly without touching other controls.
     size_t totalMenus = 0;
@@ -50,6 +70,7 @@ DWORD WINAPI InitializeLocalizer(void*) {
     }
     RuntimeLog(L"原生菜单翻译操作次数：" + std::to_wstring(totalMenus));
     RuntimeLog(L"GDI 翻译命中次数：" + std::to_wstring(GetGdiTranslationHitCount()));
+    RuntimeLog(L"GDI 未命中唯一词条：" + std::to_wstring(GetMissingTextCount()));
     RuntimeLog(L"RizomUV 中文运行时初始化完成");
     return 0;
 }

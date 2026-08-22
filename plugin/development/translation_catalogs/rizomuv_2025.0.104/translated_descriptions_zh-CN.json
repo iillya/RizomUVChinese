@@ -1,0 +1,28 @@
+{
+  "translations": {
+    "\t\tAlso, USD files can only be saved when the model as been loaded from a USD file. If you want to save a model that has been loaded from another file format, you must save it as FBX or OBJ.": "\t\t另外，只有从 USD 文件加载的模型才能保存为 USD。如果要保存从其他格式加载的模型，必须另存为 FBX 或 OBJ。",
+    "\t\tNote that OBJ files can only store a single UV set(single channel).If you wish to work with several UV channels, consider using FBX or USD format. ": "\t\t请注意，OBJ 文件只能存储一个 UV 集（单通道）。如需使用多个 UV 通道，请考虑使用 FBX 或 USD 格式。",
+    " `~!@#$%^&*()-_=+\\|[]{};:\"'<,>.?/1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ": " `~!@#$%^&*()-_=+\\|[]{};:\"'<,>.?/1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    "- Back Only, displays only the back faces.This mode is helpful to isolate and fix polygons with inverted normals.": "- 仅背面：只显示背面。此模式有助于隔离并修复法线反转的多边形。",
+    "- Front Only, displays only the front faces.Back faces are hidden, making it easier to spot flipped normals or incorrectly oriented polygons.": "- 仅正面：只显示正面并隐藏背面，更容易发现法线翻转或方向错误的多边形。",
+    "- Front Shaded / Back Solid Color, renders front faces normally(with shading) while displaying back faces in a solid color.This makes backfaces easy to identify while keeping a realistic preview of the overall geometry.\"": "- 正面着色/背面纯色：正常着色渲染正面，同时用纯色显示背面。这样既能轻松识别背面，又能保留整体几何体的真实预览。",
+    "Browse defined hotkeys, click one of them then compose the Hotkey. Right Click to unassign.": "浏览已定义的快捷键，单击其中一项后输入快捷键组合。右键单击可取消分配。",
+    "Browse...": "浏览...",
+    "CHANGE LICENSE FILE...": "更改许可证文件...",
+    "Edge Based Symmetry Detection$Shift-S$Set the symmetry map using the current edge selection (only on edge must be selected). Only the mesh topology is read, the 3D coordinates are ignored.": "基于边的对称检测$Shift-S$使用当前边选择设置对称映射（必须且只能选择一条边）。只读取网格拓扑，忽略 3D 坐标。",
+    "Email account: ": "电子邮件账户：",
+    "Expiration Date: ": "到期日期：",
+    "Import and Export island groups, island properties, pin map and edge constrains.": "导入和导出岛组、岛属性、固定贴图及边约束。",
+    "Import user normals.": "导入用户法线。",
+    "Import...": "导入...",
+    "Language:": "语言：",
+    "Load User Texture Map...$Ctrl-T$Load a texture from an image file (used in both viewports shading)": "加载用户纹理贴图...$Ctrl-T$从图像文件加载纹理（用于两个视口的着色）",
+    "New: Right click on a controller's to set its default value based on its current state.": "新增：右键单击控制项，可根据其当前状态设置默认值。",
+    "Note that the primitive selection mode has an impact on the selection behavior. In primitive edge selection mode, this dialog will select the polygon set's borders, not the edges that are included in them.": "请注意，图元选择模式会影响选择行为。在图元边选择模式下，此对话框会选择多边形集合的边界，而不是其中包含的边。",
+    "TIP: In primitive edge selection mode, this dialog will select the polygon set's borders, not the edges that are included in them.": "提示：在图元边选择模式下，此对话框会选择多边形集合的边界，而不是其中包含的边。",
+    "To change or create an hotkey please follow the instructions:": "要更改或创建快捷键，请按以下说明操作：",
+    "U...1...STANDALONE...W...2025...0...104...master...ETHERNET=e88088795de7,ETHERNET=00ff73b0c037,ETHERNET=d4d85333c192,HOSTNAME=LAPTOP-S8HJE1A8...9325": "U...1...STANDALONE...W...2025...0...104...master...ETHERNET=e88088795de7,ETHERNET=00ff73b0c037,ETHERNET=d4d85333c192,HOSTNAME=LAPTOP-S8HJE1A8...9325",
+    "You can double click on the list items to select them, or use the buttons to select or append the items to the current selection.": "可以双击列表项选择它们，也可以使用按钮选择项目或将项目追加到当前选择。",
+    "You can select multiple groups by holding down the Ctrl key while clicking on the groups, then click on \"In tiles\" or \"In New Groups\" whether you wan to distribute the selected groups in the available tiles or in new groups.": "按住 Ctrl 键并单击组可选择多个组，然后根据需要单击“在图块中”或“在新组中”，将所选组分布到可用图块或新组。"
+  }
+}

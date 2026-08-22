@@ -26,8 +26,24 @@ distribution\安装RizomUV汉化.exe
 重新运行同一个安装器并点击“一键拆卸汉化”，即可删除汉化目录及安装器创建的
 快捷方式。若 RizomUV 正在运行导致文件被占用，安装器会停止操作并提示先关闭软件。
 
-当前安装包使用 `ui_zh-CN.testing.json` 临时测试词库；长说明翻译完成并通过最终
-校验后，将打包目标切换为正式完整词库。
+当前安装包使用正式词库 `ui_zh-CN.json`。未翻译的长说明也保留在词库中，
+以“英文原文 → 英文原文”的方式维持原始显示，后续翻译审核后再替换译文。
+
+正式运行时会将词库中不存在的英文界面文字去重记录到：
+
+```text
+%LOCALAPPDATA%\RizomUVChinese\missing_ui_text_进程ID.jsonl
+```
+
+记录由后台线程定期更新，不会在 GDI 绘制调用中直接写磁盘。完成一轮界面遍历后，
+可将漏词记录重新分类为待翻译目录：
+
+```powershell
+python plugin\development\tools\build_translation_catalog.py `
+  (Get-ChildItem "$env:LOCALAPPDATA\RizomUVChinese\missing_ui_text_*.jsonl").FullName `
+  --existing plugin\translations\ui_zh-CN.json `
+  --output plugin\development\translation_catalogs\rizomuv_2025.0.104
+```
 
 ## 构建
 
@@ -51,15 +67,12 @@ build-msvc\Release\RizomUVChineseLauncher.exe
 ```
 
 启动器挂起启动原版 RizomUV，加载 `RizomUVChineseRuntime.dll` 后恢复主线程。
-运行时从 `translations/ui_zh-CN.json` 加载词库；任何初始化错误都会写入
-`RizomUVChineseRuntime.log` 并保持英文运行。
+运行时从同目录的 `ui_zh-CN.json` 加载词库；诊断日志和漏词记录统一写入
+`%LOCALAPPDATA%\RizomUVChinese`，避免普通用户无法写入安装目录。
 
-2025.0.104 当前验证结果：
-
-- 成功加载 25 条样片词条。
-- 安装 4 个当前版本实际导入的 GDI 入口。
-- File、Help、Open、Save、Save As、Auto Save 菜单成功翻译。
-- 启动阶段 GDI 翻译命中 754 次，绘制与测量使用同一份中文结果。
+2025.0.104 当前正式词库包含 3821 条映射，其中 3609 条中文译文、212 条需要
+保持原样的快捷键、单位和产品名。启动实测中运行时成功加载全部词条，绘制与测量
+使用同一份中文结果；动态用户路径、显卡名称和许可证机器指纹不进入正式词库。
 
 ## 文件夹规划
 
@@ -75,9 +88,7 @@ plugin/
 ├─ development/
 │  ├─ diagnostics/     界面探测器与文字嗅探器
 │  └─ tools/           词库维护与英文文本提取工具
-└─ data/
-   ├─ catalogs/       按 RizomUV 版本生成的待翻译目录
-   └─ translations/   UTF-8 JSON 词库
+└─ translations/     正式 UTF-8 JSON 运行词库
 dependencies/
 └─ reference/         原始提取结果与核心程序提取资料
 distribution/      可直接分发的单文件安装包
@@ -150,8 +161,8 @@ DLL 会自动捕获启动后 5 秒内的文字。需要捕获弹出窗口或其�
 ```powershell
 python plugin\development\tools\build_translation_catalog.py `
   build-msvc\Release\RizomUV_text_sniffer.jsonl `
-  --existing plugin\data\translations\ui_zh-CN.json `
-  --output plugin\data\catalogs\rizomuv_2025.0.104
+  --existing plugin\translations\ui_zh-CN.json `
+  --output plugin\development\translation_catalogs\rizomuv_2025.0.104
 ```
 
 生成内容：
@@ -163,4 +174,5 @@ python plugin\development\tools\build_translation_catalog.py `
 - `review_internal_zh-CN.json`：翻译前需要人工确认的内部标识。
 - `ignored_shortcuts_numbers.json`：默认不翻译的快捷键与数值。
 
-2025.0.104 首轮目录包含 1452 条唯一原文；现有样片词库命中其中 22 条。
+`translation_catalogs` 保留各轮提取、分类、排除和翻译结果，正式运行时只读取
+`plugin\translations\ui_zh-CN.json`。

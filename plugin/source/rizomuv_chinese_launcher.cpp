@@ -64,7 +64,7 @@ int RunLauncher(int argc, wchar_t** argv) {
         ? std::filesystem::path(argv[1])
         : FindInstalledRizomUV();
     const std::filesystem::path runtimePath = LauncherDirectory() / L"RizomUVChineseRuntime.dll";
-    const std::filesystem::path dictionaryPath = LauncherDirectory() / L"translations" / L"ui_zh-CN.json";
+    const std::filesystem::path dictionaryPath = LauncherDirectory() / L"ui_zh-CN.json";
 
     if (!std::filesystem::is_regular_file(rizomuvExecutable)) {
         std::wcerr << L"找不到 RizomUV：" << rizomuvExecutable.wstring() << L"\n";

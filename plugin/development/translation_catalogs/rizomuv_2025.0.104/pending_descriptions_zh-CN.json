@@ -1,0 +1,32 @@
+{
+  "$schema": "rizomuv-localizer-translation-v1",
+  "id": "pending-descriptions",
+  "language": "zh-CN",
+  "description": "待翻译的长说明和句子",
+  "translations": {
+    "\t\tAlso, USD files can only be saved when the model as been loaded from a USD file. If you want to save a model that has been loaded from another file format, you must save it as FBX or OBJ.": "",
+    "\t\tNote that OBJ files can only store a single UV set(single channel).If you wish to work with several UV channels, consider using FBX or USD format. ": "",
+    " `~!@#$%^&*()-_=+\\|[]{};:\"'<,>.?/1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ": "",
+    "- Back Only, displays only the back faces.This mode is helpful to isolate and fix polygons with inverted normals.": "",
+    "- Front Only, displays only the front faces.Back faces are hidden, making it easier to spot flipped normals or incorrectly oriented polygons.": "",
+    "- Front Shaded / Back Solid Color, renders front faces normally(with shading) while displaying back faces in a solid color.This makes backfaces easy to identify while keeping a realistic preview of the overall geometry.\"": "",
+    "Browse defined hotkeys, click one of them then compose the Hotkey. Right Click to unassign.": "",
+    "Browse...": "",
+    "CHANGE LICENSE FILE...": "",
+    "Edge Based Symmetry Detection$Shift-S$Set the symmetry map using the current edge selection (only on edge must be selected). Only the mesh topology is read, the 3D coordinates are ignored.": "",
+    "Email account: ": "",
+    "Expiration Date: ": "",
+    "Import and Export island groups, island properties, pin map and edge constrains.": "",
+    "Import user normals.": "",
+    "Import...": "",
+    "Language:": "",
+    "Load User Texture Map...$Ctrl-T$Load a texture from an image file (used in both viewports shading)": "",
+    "New: Right click on a controller's to set its default value based on its current state.": "",
+    "Note that the primitive selection mode has an impact on the selection behavior. In primitive edge selection mode, this dialog will select the polygon set's borders, not the edges that are included in them.": "",
+    "TIP: In primitive edge selection mode, this dialog will select the polygon set's borders, not the edges that are included in them.": "",
+    "To change or create an hotkey please follow the instructions:": "",
+    "U...1...STANDALONE...W...2025...0...104...master...ETHERNET=e88088795de7,ETHERNET=00ff73b0c037,ETHERNET=d4d85333c192,HOSTNAME=LAPTOP-S8HJE1A8...9325": "",
+    "You can double click on the list items to select them, or use the buttons to select or append the items to the current selection.": "",
+    "You can select multiple groups by holding down the Ctrl key while clicking on the groups, then click on \"In tiles\" or \"In New Groups\" whether you wan to distribute the selected groups in the available tiles or in new groups.": ""
+  }
+}

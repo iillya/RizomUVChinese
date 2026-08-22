@@ -12,6 +12,12 @@ std::mutex g_logMutex;
 }
 
 void InitializeRuntimeLog(const std::filesystem::path& runtimeDirectory) {
+    std::error_code error;
+    std::filesystem::create_directories(runtimeDirectory, error);
+    if (error) {
+        g_logPath.clear();
+        return;
+    }
     g_logPath = runtimeDirectory / L"RizomUVChineseRuntime.log";
 }
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import sys
@@ -38,6 +39,7 @@ def main() -> int:
     parser.add_argument("--reviewed", type=Path, required=True)
     parser.add_argument("--base", type=Path, required=True)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--static-source-csv", type=Path)
     parser.add_argument("--allow-missing-reviewed", action="store_true")
     args = parser.parse_args()
 
@@ -81,6 +83,32 @@ def main() -> int:
             merged[key] = value
         reviewed_count += len(translated)
         print(f"通过: {reviewed_name} ({len(translated)} 条)")
+
+    static_reviewed_path = args.reviewed / "static_interface_labels_zh-CN.json"
+    if args.static_source_csv and static_reviewed_path.exists():
+        with args.static_source_csv.open("r", encoding="utf-8-sig", newline="") as stream:
+            static_sources = {
+                row.get("source_text", "") for row in csv.DictReader(stream)
+                if row.get("source_text", "")
+            }
+        translated = read_translations(static_reviewed_path)
+        extra = translated.keys() - static_sources
+        empty = [key for key, value in translated.items() if not value.strip()]
+        if extra:
+            errors.append(
+                f"{static_reviewed_path.name}: CSV 中不存在 {len(extra)} 条，例如 {sorted(extra)[:3]}"
+            )
+        if empty:
+            errors.append(
+                f"{static_reviewed_path.name}: 空译文 {len(empty)} 条，例如 {sorted(empty)[:3]}"
+            )
+        for key, value in translated.items():
+            previous = merged.get(key)
+            if previous is not None and previous != value:
+                errors.append(f"翻译冲突: {key!r} -> {previous!r} / {value!r}")
+            merged[key] = value
+        reviewed_count += len(translated)
+        print(f"通过: {static_reviewed_path.name} ({len(translated)} 条，来源 CSV 已核对)")
 
     if errors:
         print("\n校验失败:", file=sys.stderr)
