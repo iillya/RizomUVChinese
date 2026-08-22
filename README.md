@@ -1,181 +1,185 @@
-# RizomUV 简体中文显示层补丁
+# RizomUV 简体中文补丁
 
-补丁采用两个相互独立的显示层通道：
+为 Windows 版 RizomUV 制作的简体中文显示层补丁。目前主要面向 **RizomUV Real Space 2025.0**，已在 **2025.0.104** 上完成实际测试。
 
-- 原生菜单通过 Windows 菜单接口替换。
-- 主体界面通过 GDI 绘制和测量 IAT Hook 同步替换。
+补丁不会修改 RizomUV 原始程序、许可证、工程文件或 UV 数据。关闭 RizomUV 后，所有界面汉化都会随进程一起消失。
 
-补丁不修改 `rizomuv.exe`，不改变内部命令、项目数据或许可证逻辑。
+## 主要特点
 
-## 一键安装与拆卸
+- 一键安装、一键拆卸，无需手动复制文件。
+- 汉化菜单、工具栏、面板、按钮、选项和工具提示。
+- 保留原有快捷键、命令功能和操作流程。
+- 不修改 `rizomuv.exe`，不向工程文件写入中文数据。
+- 支持手动采集遗漏的英文词条，便于持续完善词库。
+- 安装失败时自动保留或恢复上一版汉化。
 
-发布给普通用户时只需要一个文件：
+## 下载
+
+普通用户只需要下载并运行：
 
 ```text
 dist\安装RizomUV汉化.exe
 ```
 
-安装器会自动检测默认的 RizomUV 2025.0 目录，也允许手动选择其他安装位置。
-点击“一键安装汉化”后会：
+安装器需要管理员权限，因为 RizomUV 默认安装在 `C:\Program Files`。
 
-- 将启动器、运行时 DLL 和中文词库安装到 `RizomUV 2025.0\RizomUVChinese`；
-- 仅为执行安装的当前用户开放该插件目录的修改权限，以便保存手动嗅探结果；
-- 在桌面和开始菜单创建“RizomUV 简体中文版”快捷方式；
-- 采用临时目录写入和旧版本回滚，避免更新失败留下半安装状态；
-- 保持 `rizomuv.exe` 及 RizomUV 自带文件不变。
+## 安装方法
 
-重新运行同一个安装器并点击“一键拆卸汉化”，即可删除汉化目录及安装器创建的
-快捷方式。若 RizomUV 正在运行导致文件被占用，安装器会停止操作并提示先关闭软件。
+1. 保存并关闭正在运行的 RizomUV。
+2. 运行 `安装RizomUV汉化.exe`。
+3. 确认安装器识别到的 RizomUV 目录正确。
+4. 点击“安装汉化”。
+5. 安装完成后，通过桌面或开始菜单中的“RizomUV 简体中文版”启动。
 
-当前安装包使用正式词库 `ui_zh-CN.json`。未翻译的长说明也保留在词库中，
-以“英文原文 → 英文原文”的方式维持原始显示，后续翻译审核后再替换译文。
+默认安装目录为：
 
-正式运行时默认不采集漏词。需要探测当前界面时，按一次 `Shift + ~`，运行时只在
-接下来的 1.5 秒内记录词库中不存在的英文界面文字，并保存到插件目录：
+```text
+C:\Program Files\Rizom Lab\RizomUV 2025.0
+```
+
+如果 RizomUV 安装在其他位置，可以点击“选择目录”，手动选择包含 `rizomuv.exe` 的文件夹。
+
+安装器会创建：
+
+```text
+RizomUV 2025.0\RizomUVChinese\
+├─ RizomUVChineseLauncher.exe
+├─ RizomUVChineseRuntime.dll
+└─ ui_zh-CN.json
+```
+
+原版 RizomUV 文件不会被替换。
+
+## 启动方法
+
+安装后请使用“RizomUV 简体中文版”快捷方式启动。直接运行原版 `rizomuv.exe` 时不会加载汉化。
+
+中文启动器会先启动原版 RizomUV，再加载显示层运行时。RizomUV 的内部命令、模型、UV、工程和导出内容仍然使用原始数据。
+
+## 拆卸方法
+
+1. 保存并关闭 RizomUV。
+2. 再次运行 `安装RizomUV汉化.exe`。
+3. 点击“拆卸汉化”。
+
+拆卸程序只会删除 `RizomUVChinese` 目录以及本补丁创建的桌面、开始菜单快捷方式，不会删除或修改 RizomUV 本体。
+
+如果窗口已经关闭但后台仍有 `rizomuv.exe`，安装器会显示进程 PID，并询问是否强制结束。选择“是”可能导致尚未保存的数据丢失，请确认已经保存工程。
+
+## 采集遗漏的英文词条
+
+漏词采集平时处于关闭状态，不会持续扫描或写入文件。
+
+发现某个界面仍显示英文时：
+
+1. 先打开或停留在该英文界面。
+2. 按一次 `Shift + ~`。
+3. 在接下来的 1.5 秒内切换、展开或悬停需要采集的界面。
+4. 探测结束后，补丁会自动打开输出目录。
+
+采集文件保存在：
 
 ```text
 C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_进程ID.jsonl
 ```
 
-未触发时不会进行漏词统计；触发结束后由后台线程写盘，不会在 GDI 绘制调用中
-直接写磁盘。1.5 秒探测结束并完成写入后，插件会自动打开输出目录。完成一轮界面遍历后，
-可将漏词记录重新分类为待翻译目录：
+每次启动 RizomUV 会使用当前进程 ID 生成独立文件。用户路径、显卡名称、许可证机器指纹等动态内容不应加入正式词库。
 
-```powershell
-python plugin\development\tools\build_translation_catalog.py `
-  (Get-ChildItem "C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_*.jsonl").FullName `
-  --existing plugin\translations\ui_zh-CN.json `
-  --output plugin\development\translation_catalogs\rizomuv_2025.0.104
+## 安全说明
+
+这是显示层汉化，不是程序本体修改器。
+
+- 主体界面：在 RizomUV 调用 Windows GDI 绘制文字时临时替换显示参数。
+- 原生菜单：只修改当前进程内菜单对象的标题，不改变菜单命令 ID。
+- 磁盘文件：仅安装启动器、运行时 DLL、中文词库和快捷方式。
+- 工程数据：不会修改模型、UV、项目、脚本或导出文件。
+- 许可证：不会修改或绕过 RizomUV 许可证逻辑。
+
+由于启动器需要把汉化运行时加载到 RizomUV 进程，少数安全软件可能将其视为 DLL 注入并产生误报。请只从可信来源下载，必要时自行核对项目源码并重新构建。
+
+## 性能与兼容性
+
+补丁只处理界面文字，不参与 UV 展开、优化、排布或导出计算。
+
+- 漏词采集默认关闭，按快捷键后只运行 1.5 秒。
+- 菜单翻译只在启动阶段短暂扫描。
+- 菜单栏署名采用事件驱动，不持续刷新。
+- 日常开销主要是绘制文字时查询内存词库，整体影响较低。
+
+兼容性说明：
+
+- 已验证：Windows x64、RizomUV Real Space 2025.0.104。
+- 同一 2025.0 系列的小版本通常可以兼容，但新词条可能暂时显示英文。
+- 如果未来版本更换文字渲染方式，部分或全部主体界面汉化可能失效。
+- 当前方案仅处理 `rizomuv.exe` 主模块使用的已验证 GDI 文字入口。
+
+## 常见问题
+
+### 安装器提示 RizomUV 正在运行
+
+先在 RizomUV 中保存工程并正常退出。如果窗口已经关闭但进程仍在后台，可以在安装器提示中确认结束，或在任务管理器中手动结束 `rizomuv.exe`。
+
+### 提示无法清理临时目录或备份目录
+
+通常是旧运行时 DLL 仍被 RizomUV 占用。关闭所有 RizomUV 进程后重新运行最新版安装器。新版安装器会自动恢复上次更新留下的 `.previous` 备份。
+
+### 安装后仍是英文
+
+- 确认使用的是“RizomUV 简体中文版”快捷方式，而不是原版快捷方式。
+- 确认 `RizomUVChinese` 目录中的三个文件完整存在。
+- 查看同目录下的 `RizomUVChineseRuntime.log`。
+- 如果只有少数位置是英文，请使用 `Shift + ~` 采集漏词。
+
+### `Shift + ~` 没有生成文件
+
+- 确认已经使用最新版安装包重新安装。
+- 确认日志中出现“UI 漏词探测已就绪”。
+- 快捷键可能被其他程序占用；关闭相关软件后重试。
+- 如果本轮没有未翻译英文，目录仍会打开，但不一定生成新的内容。
+
+### 中文文字显示不完整
+
+部分界面尺寸由原版布局决定，中文比英文更长时可能出现拥挤或截断。请截图并附上对应的漏词采集文件反馈。
+
+## 当前词库
+
+正式词库位于：
+
+```text
+plugin\translations\ui_zh-CN.json
 ```
 
-## 构建
+RizomUV 2025.0.104 词库目前包含 3836 条映射，其中包括中文译文，以及必须保持原样的快捷键、单位和产品名称。
+
+## 开发与构建
+
+需要 Visual Studio 2022、CMake 和 Windows x64 工具链。
 
 ```powershell
 cmake -S . -B build-msvc -G "Visual Studio 17 2022" -A x64
-cmake --build build-msvc --config Release
-```
-
-生成自包含的一键安装包：
-
-```powershell
 cmake --build build-msvc --config Release --target RizomUVOneClickPackage
 ```
 
-## 汉化样片
-
-构建后运行：
-
-```powershell
-build-msvc\Release\RizomUVChineseLauncher.exe
-```
-
-启动器挂起启动原版 RizomUV，加载 `RizomUVChineseRuntime.dll` 后恢复主线程。
-运行时从同目录的 `ui_zh-CN.json` 加载词库；诊断日志和手动触发生成的漏词记录
-均写入插件目录。
-
-2025.0.104 当前正式词库包含 3836 条映射，其中 3624 条中文译文、212 条需要
-保持原样的快捷键、单位和产品名。启动实测中运行时成功加载全部词条，绘制与测量
-使用同一份中文结果；动态用户路径、显卡名称和许可证机器指纹不进入正式词库。
-
-## 文件夹规划
+生成的单文件安装包位于：
 
 ```text
-plugin/
-├─ source/
-│  ├─ rizomuv_chinese_installer.cpp  一键安装与拆卸程序
-│  ├─ rizomuv_chinese_launcher.cpp   中文启动器
-│  ├─ rizomuv_chinese_runtime.cpp    进程内翻译运行时
-│  ├─ *_hooks.cpp / *.h              显示层 Hook 模块
-│  ├─ translation_dictionary.cpp     运行词库
-│  └─ rizomuv_localizer/             模块接口头文件
-├─ development/
-│  ├─ diagnostics/     界面探测器与文字嗅探器
-│  └─ tools/           词库维护与英文文本提取工具
-└─ translations/     正式 UTF-8 JSON 运行词库
-dependencies/
-└─ reference/         原始提取结果与核心程序提取资料
-dist/              可直接分发的单文件安装包
+dist\安装RizomUV汉化.exe
 ```
 
-一键安装器的产品交互与安全回滚思路参考了 GPL-3.0 项目
-[iillya/Toolbag](https://github.com/iillya/Toolbag)，并针对 RizomUV 的独立启动器和
-GDI IAT Hook 架构重新实现。
+项目主要目录：
 
-## 使用
-
-先启动 RizomUV，再执行：
-
-```powershell
-build-msvc\Release\RizomUVUiProbe.exe --process rizomuv.exe --output rizomuv-ui.json
+```text
+plugin\source\                             补丁、启动器与安装器源码
+plugin\translations\                       正式运行词库
+plugin\resources\                          程序图标资源
+plugin\development\diagnostics\            开发期探测工具
+plugin\development\tools\                  词库整理工具
+plugin\development\translation_catalogs\   提取、分类与翻译记录
+dist\                                      发布安装包
 ```
 
-持续观察 15 秒，捕获期间打开的对话框和菜单：
+## 鸣谢与许可
 
-```powershell
-build-msvc\Release\RizomUVUiProbe.exe --process rizomuv.exe --watch 15 --output rizomuv-ui.json
-```
+一键安装器的交互与安全回滚思路参考了 GPL-3.0 项目 [iillya/Toolbag](https://github.com/iillya/Toolbag)，并针对 RizomUV 的独立启动器和显示层架构重新实现。
 
-测试某个标准窗口是否允许显示层替换（3 秒后自动恢复）：
-
-```powershell
-build-msvc\Release\RizomUVUiProbe.exe --process rizomuv.exe --test-text "File" "文件"
-```
-
-探测报告包含窗口类名、控件层级、可读取文本、菜单文本以及发送
-`WM_GETTEXT`/`WM_SETTEXT` 的结果。`--test-text` 只对完全匹配的一个控件执行，
-且会自动恢复原文。
-
-## RizomUV 2025.0.104 初步结果
-
-- 捕获到 2321 个窗口/控件、9 个原生菜单项和 278 个 UI Automation 元素。
-- File、Help、Open、Save、Save As 和 Auto Save 等菜单文字可直接读取。
-- `File -> 文件` 临时替换测试成功，3 秒后成功恢复。
-- 大多数主体面板仅暴露为 `wxWindow`/`wxWindowNR`，名称为 `panel`；按钮和标签
-  文字没有通过 HWND 或 UI Automation 暴露。
-
-结论：原生菜单可通过菜单接口替换；主体界面已确认经过 GDI 绘制与测量入口。
-
-## 文字绘制链路嗅探器
-
-构建后通过下面的启动器运行 RizomUV：
-
-```powershell
-build-msvc\Release\RizomUVSnifferLauncher.exe
-```
-
-DLL 会自动捕获启动后 5 秒内的文字。需要捕获弹出窗口或其他面板时，按
-`Ctrl+Shift+F12`，随后 3 秒内操作目标界面。结果保存在启动器旁边的
-`RizomUV_text_sniffer.jsonl`。嗅探器只记录，不替换文字。
-
-2025.0.104 实测捕获到：
-
-- `GetTextExtentPoint32W`：1452 条唯一文本，包括 Cut、Weld、Unfold、Optimize、
-  Pack 以及大量工具提示。
-- `ExtTextOutW`：13 条首屏绘制文本，包括 UV Set、Select、Unwrap、Packing、
-  Auto Seams 和 Contextual Help。
-
-这证明主体界面使用 GDI 文字测量和绘制。正式运行时已经在相同入口使用统一词库
-替换，确保绘制与尺寸测量获得相同中文。
-
-## 英文词条目录
-
-通过嗅探日志生成可重复的分类目录：
-
-```powershell
-python plugin\development\tools\build_translation_catalog.py `
-  build-msvc\Release\RizomUV_text_sniffer.jsonl `
-  --existing plugin\translations\ui_zh-CN.json `
-  --output plugin\development\translation_catalogs\rizomuv_2025.0.104
-```
-
-生成内容：
-
-- `english_text_catalog.json`：完整原文索引、来源 API、出现次数和当前译文。
-- `pending_interface_labels_zh-CN.json`：短标签、按钮和菜单。
-- `pending_tooltips_zh-CN.json`：包含标题、快捷键和说明的复合工具提示。
-- `pending_descriptions_zh-CN.json`：长句和帮助说明。
-- `review_internal_zh-CN.json`：翻译前需要人工确认的内部标识。
-- `ignored_shortcuts_numbers.json`：默认不翻译的快捷键与数值。
-
-`translation_catalogs` 保留各轮提取、分类、排除和翻译结果，正式运行时只读取
-`plugin\translations\ui_zh-CN.json`。
+本项目许可信息见 [LICENSE](LICENSE)。RizomUV 是 Rizom-Lab 的产品，本项目为非官方社区汉化补丁，与 Rizom-Lab 无隶属关系。
