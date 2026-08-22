@@ -12,7 +12,7 @@
 发布给普通用户时只需要一个文件：
 
 ```text
-distribution\安装RizomUV汉化.exe
+dist\安装RizomUV汉化.exe
 ```
 
 安装器会自动检测默认的 RizomUV 2025.0 目录，也允许手动选择其他安装位置。
@@ -94,7 +94,7 @@ plugin/
 └─ translations/     正式 UTF-8 JSON 运行词库
 dependencies/
 └─ reference/         原始提取结果与核心程序提取资料
-distribution/      可直接分发的单文件安装包
+dist/              可直接分发的单文件安装包
 ```
 
 一键安装器的产品交互与安全回滚思路参考了 GPL-3.0 项目
