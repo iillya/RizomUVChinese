@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(RizomUVChinese LANGUAGES CXX)
 
-option(RIZOMUV_HOOK_TEXT_MEASUREMENT
-  "Translate GDI text measurement calls together with drawing calls" ON)
-
 add_executable(RizomUVUiProbe EXCLUDE_FROM_ALL plugin/development/diagnostics/interface_probe.cpp)
 target_compile_features(RizomUVUiProbe PRIVATE cxx_std_17)
 target_compile_definitions(RizomUVUiProbe PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN
@@ -42,10 +39,6 @@ target_include_directories(RizomUVChineseRuntime PRIVATE "${LOCALIZER_INCLUDE_DI
 target_compile_features(RizomUVChineseRuntime PRIVATE cxx_std_17)
 target_compile_definitions(RizomUVChineseRuntime PRIVATE
   UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
-if(RIZOMUV_HOOK_TEXT_MEASUREMENT)
-  target_compile_definitions(RizomUVChineseRuntime PRIVATE
-    RIZOMUV_HOOK_TEXT_MEASUREMENT=1)
-endif()
 target_link_libraries(RizomUVChineseRuntime PRIVATE user32 gdi32 shell32)
 set_target_properties(RizomUVChineseRuntime PROPERTIES PREFIX "")
 

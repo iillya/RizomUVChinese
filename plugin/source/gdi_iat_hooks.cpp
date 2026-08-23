@@ -21,19 +21,15 @@ using DrawTextWFn = int (WINAPI*)(HDC, LPCWSTR, int, LPRECT, UINT);
 using DrawTextExWFn = int (WINAPI*)(HDC, LPWSTR, int, LPRECT, UINT, LPDRAWTEXTPARAMS);
 using TextOutWFn = BOOL (WINAPI*)(HDC, int, int, LPCWSTR, int);
 using ExtTextOutWFn = BOOL (WINAPI*)(HDC, int, int, UINT, const RECT*, LPCWSTR, UINT, const INT*);
-#if RIZOMUV_HOOK_TEXT_MEASUREMENT
 using GetTextExtentPoint32WFn = BOOL (WINAPI*)(HDC, LPCWSTR, int, LPSIZE);
 using GetTextExtentExPointWFn = BOOL (WINAPI*)(HDC, LPCWSTR, int, int, LPINT, LPINT, LPSIZE);
-#endif
 
 DrawTextWFn g_drawTextW = nullptr;
 DrawTextExWFn g_drawTextExW = nullptr;
 TextOutWFn g_textOutW = nullptr;
 ExtTextOutWFn g_extTextOutW = nullptr;
-#if RIZOMUV_HOOK_TEXT_MEASUREMENT
 GetTextExtentPoint32WFn g_getTextExtentPoint32W = nullptr;
 GetTextExtentExPointWFn g_getTextExtentExPointW = nullptr;
-#endif
 const TranslationDictionary* g_dictionary = nullptr;
 thread_local std::wstring g_translatedText;
 std::atomic<unsigned long long> g_translationHits{0};
@@ -264,7 +260,6 @@ BOOL WINAPI HookExtTextOutW(HDC dc, int x, int y, UINT options, const RECT* rect
     return g_extTextOutW(dc, x, y, options, rect, value.text,
                          static_cast<UINT>(value.length), translatedSpacing);
 }
-#if RIZOMUV_HOOK_TEXT_MEASUREMENT
 BOOL WINAPI HookGetTextExtentPoint32W(HDC dc, LPCWSTR text, int count, LPSIZE size) {
     const TextView value = Translate(L"GetTextExtentPoint32W", text, count);
     return g_getTextExtentPoint32W(dc, value.text, value.length, size);
@@ -274,7 +269,6 @@ BOOL WINAPI HookGetTextExtentExPointW(HDC dc, LPCWSTR text, int count, int maxEx
     const TextView value = Translate(L"GetTextExtentExPointW", text, count);
     return g_getTextExtentExPointW(dc, value.text, value.length, maxExtent, fit, dx, size);
 }
-#endif
 
 bool PatchSlot(void** slot, void* replacement, void** original) {
     DWORD oldProtection = 0;
@@ -358,23 +352,16 @@ bool InstallGdiIatHooks(HMODULE targetModule, const TranslationDictionary* dicti
             else if (strcmp(name, "DrawTextExW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookDrawTextExW), reinterpret_cast<void**>(&g_drawTextExW));
             else if (strcmp(name, "TextOutW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookTextOutW), reinterpret_cast<void**>(&g_textOutW));
             else if (strcmp(name, "ExtTextOutW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookExtTextOutW), reinterpret_cast<void**>(&g_extTextOutW));
-#if RIZOMUV_HOOK_TEXT_MEASUREMENT
             else if (strcmp(name, "GetTextExtentPoint32W") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookGetTextExtentPoint32W), reinterpret_cast<void**>(&g_getTextExtentPoint32W));
             else if (strcmp(name, "GetTextExtentExPointW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookGetTextExtentExPointW), reinterpret_cast<void**>(&g_getTextExtentExPointW));
-#endif
             if (patched) ++installed;
         }
     }
-    if (!g_extTextOutW) {
-        error = L"缺少已验证的 GDI 绘制入口";
+    if (!g_getTextExtentPoint32W || !g_extTextOutW) {
+        error = L"缺少已验证的 GDI 测量或绘制入口";
         return false;
     }
     RuntimeLog(L"已安装 GDI IAT Hook：" + std::to_wstring(installed) + L" 个入口");
-#if RIZOMUV_HOOK_TEXT_MEASUREMENT
-    RuntimeLog(L"文字处理模式：绘制与长度测量同步翻译");
-#else
-    RuntimeLog(L"文字处理模式：仅翻译绘制，不 Hook 长度测量（测试）");
-#endif
     return true;
 }
 
