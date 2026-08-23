@@ -1146,7 +1146,7 @@
     "Expiration Date:": "到期日期：",
     "Expiration Date: ": "到期日期：",
     "Expire Time:": "到期时间：",
-    "Explorer...": "Explorer...",
+    "Explorer...": "资源管理器...",
     "Export": "导出",
     "Export Borders in DXF": "导出 DXF 边界",
     "Export Borders in DXF$$Exports the boundaries as LWPOLYLINEs in a DXF file. Current scene units are used to specify the DXF units. Scene units are set from the input file or set to 'cm' as default. If you need to set the file unit, open the UV Set panel and use the Scene unit controller.": "导出 DXF 边界$$将边界作为 LWPOLYLINE 导出到 DXF 文件。DXF 单位使用当前场景单位；场景单位来自输入文件，默认设为厘米。如需设置文件单位，请打开 UV 集面板并使用场景单位控制项。",
