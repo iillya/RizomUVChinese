@@ -75,6 +75,28 @@ bool IsMissingTextCandidate(const std::wstring& text) {
     return hasLatinLetter;
 }
 
+bool ShouldLookupTranslation(LPCWSTR text, int length) {
+    if (!text || length <= 0) return false;
+    const bool driveAbsolutePath = length >= 3 &&
+        ((text[0] >= L'A' && text[0] <= L'Z') ||
+         (text[0] >= L'a' && text[0] <= L'z')) &&
+        text[1] == L':' && (text[2] == L'\\' || text[2] == L'/');
+    const bool uncPath = length >= 3 && text[0] == L'\\' && text[1] == L'\\';
+    if (driveAbsolutePath || uncPath) return false;
+
+    bool hasLatinLetter = false;
+    for (int index = 0; index < length; ++index) {
+        const wchar_t character = text[index];
+        if ((character >= 0x3400 && character <= 0x9FFF) ||
+            (character >= 0xF900 && character <= 0xFAFF))
+            return false;
+        if ((character >= L'A' && character <= L'Z') ||
+            (character >= L'a' && character <= L'z'))
+            hasLatinLetter = true;
+    }
+    return hasLatinLetter;
+}
+
 std::string Utf8(const std::wstring& value) {
     if (value.empty()) return {};
     const int size = WideCharToMultiByte(CP_UTF8, 0, value.data(),
@@ -242,6 +264,7 @@ TextView Translate(const wchar_t* api, LPCWSTR text, int length) {
     if (!g_dictionary || !text) return {text, length};
     if (length < 0) length = static_cast<int>(wcsnlen_s(text, 65536));
     if (length <= 0 || length > 65535) return {text, length};
+    if (!ShouldLookupTranslation(text, length)) return {text, length};
     const std::wstring source(text, text + length);
     const std::wstring* translated = g_dictionary->Find(source);
     if (!translated) {
