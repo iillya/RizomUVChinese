@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cstdio>
+#include <cstdint>
 #include <filesystem>
 #include <mutex>
 #include <unordered_map>
@@ -38,10 +39,12 @@ std::mutex g_missingTextMutex;
 std::atomic<bool> g_missingTextDirty{false};
 std::atomic<bool> g_missingTextCaptureStarted{false};
 std::atomic<ULONGLONG> g_missingTextCaptureUntil{0};
+std::atomic<ULONGLONG> g_missingTextCaptureGeneration{0};
 std::atomic<bool> g_hotkeyRegistrationSucceeded{false};
 
 constexpr int kCaptureHotkeyId = 1;
 constexpr ULONGLONG kCaptureDurationMilliseconds = 1500;
+constexpr DWORD kCaptureCompletionDelayMilliseconds = 1750;
 
 struct MissingTextEntry {
     std::wstring text;
@@ -174,6 +177,35 @@ bool WriteMissingTextSnapshot() {
     return true;
 }
 
+DWORD WINAPI CompleteMissingTextCapture(void* generationValue) {
+    const ULONGLONG generation = static_cast<ULONGLONG>(
+        reinterpret_cast<std::uintptr_t>(generationValue));
+    Sleep(kCaptureCompletionDelayMilliseconds);
+    bool writeFailureLogged = false;
+    for (;;) {
+        if (generation != g_missingTextCaptureGeneration.load(
+                              std::memory_order_acquire))
+            return 0;
+        const bool dirty = g_missingTextDirty.exchange(
+            false, std::memory_order_acq_rel);
+        if (!dirty || WriteMissingTextSnapshot()) {
+            const std::filesystem::path outputDirectory =
+                g_missingTextPath.parent_path();
+            RuntimeLog(L"UI 漏词探测完成，正在打开输出目录");
+            ShellExecuteW(nullptr, L"open", outputDirectory.c_str(),
+                          nullptr, nullptr, SW_SHOWNORMAL);
+            return 0;
+        }
+        g_missingTextDirty.store(true, std::memory_order_release);
+        if (!writeFailureLogged) {
+            RuntimeLog(L"漏词文件写入失败，将继续重试：" +
+                       g_missingTextPath.wstring());
+            writeFailureLogged = true;
+        }
+        Sleep(1000);
+    }
+}
+
 DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
     const bool registered = RegisterHotKey(nullptr, kCaptureHotkeyId,
         MOD_SHIFT | MOD_NOREPEAT, VK_OEM_3) != FALSE;
@@ -181,8 +213,6 @@ DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
     SetEvent(static_cast<HANDLE>(readyEventValue));
     if (!registered) return 1;
 
-    bool writeFailureLogged = false;
-    UINT_PTR flushTimerId = 0;
     MSG message{};
     while (GetMessageW(&message, nullptr, 0, 0) > 0) {
         if (message.message == WM_HOTKEY &&
@@ -190,35 +220,18 @@ DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
             g_missingTextCaptureUntil.store(
                 GetTickCount64() + kCaptureDurationMilliseconds,
                 std::memory_order_release);
-            if (flushTimerId) KillTimer(nullptr, flushTimerId);
-            flushTimerId = SetTimer(nullptr, 0,
-                static_cast<UINT>(kCaptureDurationMilliseconds + 250), nullptr);
+            const ULONGLONG generation =
+                g_missingTextCaptureGeneration.fetch_add(
+                    1, std::memory_order_acq_rel) + 1;
+            HANDLE completionThread = CreateThread(
+                nullptr, 0, CompleteMissingTextCapture,
+                reinterpret_cast<void*>(static_cast<std::uintptr_t>(generation)),
+                0, nullptr);
+            if (completionThread) CloseHandle(completionThread);
+            else RuntimeLog(L"无法启动 UI 漏词探测完成线程");
             RuntimeLog(L"已触发 UI 漏词探测：持续 1.5 秒");
-        } else if (message.message == WM_TIMER &&
-                   message.wParam == flushTimerId &&
-                   GetTickCount64() > g_missingTextCaptureUntil.load(
-                       std::memory_order_acquire)) {
-            const bool dirty = g_missingTextDirty.exchange(
-                false, std::memory_order_acq_rel);
-            if (!dirty || WriteMissingTextSnapshot()) {
-                KillTimer(nullptr, flushTimerId);
-                flushTimerId = 0;
-                writeFailureLogged = false;
-                const std::filesystem::path outputDirectory =
-                    g_missingTextPath.parent_path();
-                ShellExecuteW(nullptr, L"open", outputDirectory.c_str(),
-                              nullptr, nullptr, SW_SHOWNORMAL);
-            } else {
-                g_missingTextDirty.store(true, std::memory_order_release);
-                if (!writeFailureLogged) {
-                    RuntimeLog(L"漏词文件写入失败，将继续重试：" +
-                               g_missingTextPath.wstring());
-                    writeFailureLogged = true;
-                }
-            }
         }
     }
-    if (flushTimerId) KillTimer(nullptr, flushTimerId);
     UnregisterHotKey(nullptr, kCaptureHotkeyId);
     return 0;
 }
