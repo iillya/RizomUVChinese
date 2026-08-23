@@ -81,15 +81,33 @@ bool IsValidRizomDirectory(const std::filesystem::path& directory) {
     return valid;
 }
 
-std::vector<DWORD> RizomUVProcessIds() {
+std::vector<DWORD> RizomUVProcessIds(
+    const std::filesystem::path& rizomDirectory) {
     std::vector<DWORD> processIds;
+    std::error_code pathError;
+    const std::filesystem::path targetExecutable = std::filesystem::weakly_canonical(
+        rizomDirectory / L"rizomuv.exe", pathError);
+    if (pathError) return processIds;
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (snapshot == INVALID_HANDLE_VALUE) return processIds;
     PROCESSENTRY32W process{};
     process.dwSize = sizeof(process);
     if (Process32FirstW(snapshot, &process)) {
         do {
-            if (_wcsicmp(process.szExeFile, L"rizomuv.exe") == 0)
+            if (process.th32ProcessID == GetCurrentProcessId() ||
+                _wcsicmp(process.szExeFile, L"rizomuv.exe") != 0)
+                continue;
+            HANDLE processHandle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION,
+                                               FALSE, process.th32ProcessID);
+            if (!processHandle) continue;
+            std::vector<wchar_t> executablePath(32768);
+            DWORD length = static_cast<DWORD>(executablePath.size());
+            const bool pathRead = QueryFullProcessImageNameW(
+                processHandle, 0, executablePath.data(), &length) != FALSE;
+            CloseHandle(processHandle);
+            if (pathRead && _wcsicmp(
+                    std::wstring(executablePath.data(), length).c_str(),
+                    targetExecutable.c_str()) == 0)
                 processIds.push_back(process.th32ProcessID);
         } while (Process32NextW(snapshot, &process));
     }
@@ -97,13 +115,13 @@ std::vector<DWORD> RizomUVProcessIds() {
     return processIds;
 }
 
-bool IsRizomUVRunning() {
-    return !RizomUVProcessIds().empty();
+bool IsRizomUVRunning(const std::filesystem::path& rizomDirectory) {
+    return !RizomUVProcessIds(rizomDirectory).empty();
 }
 
-bool TerminateRizomUVProcesses() {
+bool TerminateRizomUVProcesses(const std::filesystem::path& rizomDirectory) {
     bool success = true;
-    for (DWORD processId : RizomUVProcessIds()) {
+    for (DWORD processId : RizomUVProcessIds(rizomDirectory)) {
         HANDLE process = OpenProcess(PROCESS_TERMINATE | SYNCHRONIZE,
                                      FALSE, processId);
         if (!process) {
@@ -115,7 +133,7 @@ bool TerminateRizomUVProcesses() {
             success = false;
         CloseHandle(process);
     }
-    return success && !IsRizomUVRunning();
+    return success && !IsRizomUVRunning(rizomDirectory);
 }
 
 std::filesystem::path DefaultRizomDirectory() {
@@ -281,7 +299,7 @@ std::vector<std::filesystem::path> ShortcutPaths() {
 }
 
 bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message) {
-    if (IsRizomUVRunning()) {
+    if (IsRizomUVRunning(rizomDirectory)) {
         message = L"RizomUV 正在运行。\n请先关闭 RizomUV，再安装汉化。";
         return false;
     }
@@ -369,7 +387,7 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
 }
 
 bool Uninstall(const std::filesystem::path& rizomDirectory, std::wstring& message) {
-    if (IsRizomUVRunning()) {
+    if (IsRizomUVRunning(rizomDirectory)) {
         message = L"RizomUV 正在运行。\n请先关闭 RizomUV，再拆卸汉化。";
         return false;
     }
@@ -448,7 +466,7 @@ LRESULT CALLBACK WindowProcedure(HWND window, UINT message, WPARAM wParam, LPARA
                             kTitle, MB_OK | MB_ICONERROR);
                 return 0;
             }
-            const std::vector<DWORD> runningProcesses = RizomUVProcessIds();
+            const std::vector<DWORD> runningProcesses = RizomUVProcessIds(directory);
             if (!runningProcesses.empty()) {
                 std::wstring prompt = L"检测到 RizomUV 仍在后台运行（PID ";
                 for (size_t index = 0; index < runningProcesses.size(); ++index) {
@@ -460,7 +478,7 @@ LRESULT CALLBACK WindowProcedure(HWND window, UINT message, WPARAM wParam, LPARA
                 if (MessageBoxW(window, prompt.c_str(), kTitle,
                                 MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2) != IDYES)
                     return 0;
-                if (!TerminateRizomUVProcesses()) {
+                if (!TerminateRizomUVProcesses(directory)) {
                     MessageBoxW(window, L"无法结束后台 RizomUV 进程。\n请在任务管理器中结束后重试。",
                                 kTitle, MB_OK | MB_ICONERROR);
                     return 0;
