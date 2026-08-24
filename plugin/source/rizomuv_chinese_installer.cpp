@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <aclapi.h>
+#include <sddl.h>
 #include <tlhelp32.h>
 #include <commctrl.h>
 #include <shlobj.h>
@@ -230,6 +231,100 @@ std::filesystem::path KnownFolder(REFKNOWNFOLDERID id) {
     return result;
 }
 
+// ---------------------------------------------------------------------------
+// Interactive-user shortcut placement
+// ---------------------------------------------------------------------------
+// The installer runs elevated, so the process identity is an administrator
+// account and NOT necessarily the person who will actually launch the app.
+// Creating shortcuts against the elevated token puts them in the wrong user's
+// Desktop / Start Menu (the user then reports "no shortcut was created").
+// Instead, resolve the interactive console session (the explorer.exe owner of
+// the current session) and place shortcuts in *that* user's real folders,
+// honouring any Desktop / Start Menu redirection (e.g. OneDrive).
+
+// Shared PUBLIC (interactive) folders are always writable from the elevated
+// context; per-user folders must be resolved from the interactive user's SID.
+std::wstring InteractiveSessionSid() {
+    DWORD sessionId = 0;
+    ProcessIdToSessionId(GetCurrentProcessId(), &sessionId);
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot == INVALID_HANDLE_VALUE) return L"";
+    std::wstring found;
+    PROCESSENTRY32W entry{};
+    entry.dwSize = sizeof(entry);
+    if (Process32FirstW(snapshot, &entry)) {
+        do {
+            if (_wcsicmp(entry.szExeFile, L"explorer.exe") != 0) continue;
+            DWORD processSession = 0;
+            if (!ProcessIdToSessionId(entry.th32ProcessID, &processSession) ||
+                processSession != sessionId) continue;
+            HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION,
+                                        FALSE, entry.th32ProcessID);
+            if (!process) continue;
+            HANDLE token = nullptr;
+            if (OpenProcessToken(process, TOKEN_QUERY, &token)) {
+                DWORD required = 0;
+                GetTokenInformation(token, TokenUser, nullptr, 0, &required);
+                std::vector<unsigned char> buffer(required);
+                if (required > 0 && GetTokenInformation(
+                        token, TokenUser, buffer.data(), required, &required)) {
+                    TOKEN_USER* user = reinterpret_cast<TOKEN_USER*>(buffer.data());
+                    LPWSTR sidString = nullptr;
+                    if (ConvertSidToStringSidW(user->User.Sid, &sidString)) {
+                        found = sidString;
+                        LocalFree(sidString);
+                    }
+                }
+                CloseHandle(token);
+            }
+            CloseHandle(process);
+            if (!found.empty()) break;
+        } while (Process32NextW(snapshot, &entry));
+    }
+    CloseHandle(snapshot);
+    return found;
+}
+
+// Read the interactive user's real folder path from HKEY_USERS\<SID>, which
+// reflects Desktop / Start Menu redirection (e.g. OneDrive) and expands any
+// %USERPROFILE% variable. Returns empty if the SID has no usable entry.
+std::filesystem::path InteractiveUserFolder(REFKNOWNFOLDERID id) {
+    const std::wstring sid = InteractiveSessionSid();
+    if (sid.empty()) return std::filesystem::path();
+    const wchar_t* valueName = nullptr;
+    if (id == FOLDERID_Desktop) valueName = L"Desktop";
+    else if (id == FOLDERID_Programs) valueName = L"Programs";
+    if (!valueName) return std::filesystem::path();
+
+    HKEY hive = nullptr;
+    if (RegOpenKeyExW(HKEY_USERS, sid.c_str(), 0, KEY_READ, &hive) != ERROR_SUCCESS)
+        return std::filesystem::path();
+    HKEY shellFolders = nullptr;
+    if (RegOpenKeyExW(hive,
+            L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders",
+            0, KEY_READ, &shellFolders) != ERROR_SUCCESS) {
+        RegCloseKey(hive);
+        return std::filesystem::path();
+    }
+    wchar_t raw[2048] = {};
+    DWORD size = sizeof(raw);
+    DWORD type = 0;
+    std::wstring value;
+    if (RegQueryValueExW(shellFolders, valueName, nullptr, &type,
+                         reinterpret_cast<BYTE*>(raw), &size) == ERROR_SUCCESS)
+        value = raw;
+    RegCloseKey(shellFolders);
+    RegCloseKey(hive);
+    if (value.empty()) return std::filesystem::path();
+
+    std::vector<wchar_t> expanded(8192);
+    const DWORD length = ExpandEnvironmentStringsW(
+        value.c_str(), expanded.data(), static_cast<DWORD>(expanded.size()));
+    if (length && length <= expanded.size())
+        return std::filesystem::path(std::wstring(expanded.data(), length - 1));
+    return std::filesystem::path(value);
+}
+
 bool CreateShortcut(const std::filesystem::path& shortcut,
                     const std::filesystem::path& launcher,
                     const std::filesystem::path& workingDirectory) {
@@ -291,11 +386,72 @@ bool GrantCurrentUserPluginAccess(const std::filesystem::path& directory) {
     return applied;
 }
 
+// The installer runs elevated, so the shortcut it writes is owned by the
+// elevated account. Grant the target user full control on the .lnk so a normal
+// user can always open it; otherwise Windows reports that the item referenced
+// by the shortcut cannot be accessed / no permission.
+bool GrantShortcutAccess(const std::filesystem::path& shortcut) {
+    HANDLE token = nullptr;
+    if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &token)) return false;
+    DWORD required = 0;
+    GetTokenInformation(token, TokenUser, nullptr, 0, &required);
+    std::vector<unsigned char> tokenInfo(required);
+    const bool tokenRead = required > 0 && GetTokenInformation(
+        token, TokenUser, tokenInfo.data(), required, &required) != FALSE;
+    CloseHandle(token);
+    if (!tokenRead) return false;
+    auto* tokenUser = reinterpret_cast<TOKEN_USER*>(tokenInfo.data());
+
+    PSECURITY_DESCRIPTOR securityDescriptor = nullptr;
+    PACL currentDacl = nullptr;
+    const DWORD securityRead = GetNamedSecurityInfoW(
+        const_cast<wchar_t*>(shortcut.c_str()), SE_FILE_OBJECT,
+        DACL_SECURITY_INFORMATION, nullptr, nullptr, &currentDacl, nullptr,
+        &securityDescriptor);
+    if (securityRead != ERROR_SUCCESS) return false;
+
+    EXPLICIT_ACCESSW access{};
+    access.grfAccessPermissions = GENERIC_ALL | WRITE_DAC | WRITE_OWNER | DELETE;
+    access.grfAccessMode = GRANT_ACCESS;
+    access.grfInheritance = NO_INHERITANCE;
+    access.Trustee.TrusteeForm = TRUSTEE_IS_SID;
+    access.Trustee.TrusteeType = TRUSTEE_IS_USER;
+    access.Trustee.ptstrName = static_cast<LPWSTR>(tokenUser->User.Sid);
+
+    PACL updatedDacl = nullptr;
+    const DWORD aclCreated = SetEntriesInAclW(1, &access, currentDacl, &updatedDacl);
+    bool applied = false;
+    if (aclCreated == ERROR_SUCCESS) {
+        // DACL grant is what makes the shortcut openable; setting the owner is
+        // cosmetic and may fail without SeRestorePrivilege, so apply it
+        // independently and never let it block the access grant.
+        applied = SetNamedSecurityInfoW(
+            const_cast<wchar_t*>(shortcut.c_str()), SE_FILE_OBJECT,
+            DACL_SECURITY_INFORMATION, nullptr, nullptr, updatedDacl,
+            nullptr) == ERROR_SUCCESS;
+        SetNamedSecurityInfoW(const_cast<wchar_t*>(shortcut.c_str()), SE_FILE_OBJECT,
+                              OWNER_SECURITY_INFORMATION,
+                              static_cast<PSID>(tokenUser->User.Sid),
+                              nullptr, nullptr, nullptr);
+    }
+    if (updatedDacl) LocalFree(updatedDacl);
+    LocalFree(securityDescriptor);
+    return applied;
+}
+
 std::vector<std::filesystem::path> ShortcutPaths() {
-    return {
-        KnownFolder(FOLDERID_Desktop) / L"RizomUV 简体中文版.lnk",
-        KnownFolder(FOLDERID_Programs) / L"RizomUV 简体中文版.lnk",
-    };
+    std::vector<std::filesystem::path> paths;
+    // Prefer the interactive user's real folders so shortcuts land on the
+    // account that will actually run the app, even under elevation and even
+    // when Desktop/Start Menu are redirected (OneDrive). Fall back to the
+    // process's own known folders if the interactive user cannot be resolved.
+    std::filesystem::path desktop = InteractiveUserFolder(FOLDERID_Desktop);
+    std::filesystem::path programs = InteractiveUserFolder(FOLDERID_Programs);
+    if (desktop.empty()) desktop = KnownFolder(FOLDERID_Desktop);
+    if (programs.empty()) programs = KnownFolder(FOLDERID_Programs);
+    if (!desktop.empty()) paths.push_back(desktop / L"RizomUV 简体中文版.lnk");
+    if (!programs.empty()) paths.push_back(programs / L"RizomUV 简体中文版.lnk");
+    return paths;
 }
 
 bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message) {
@@ -381,6 +537,7 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
             message = L"汉化文件已安装，但创建快捷方式失败。";
             return false;
         }
+        GrantShortcutAccess(shortcut);
     }
     message = L"汉化安装完成。\n\n桌面和开始菜单已创建“RizomUV 简体中文版”快捷方式。\n以后请通过该快捷方式启动。";
     return true;
