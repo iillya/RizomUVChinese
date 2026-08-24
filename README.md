@@ -42,7 +42,7 @@ C:\Program Files\Rizom Lab\RizomUV 2025.0
 安装器会创建：
 
 ```text
-RizomUV 2025.0\RizomUVChinese\
+RizomUV 2025.0\ChineseLauncher\
 ├─ RizomUVChineseLauncher.exe
 ├─ RizomUVChineseRuntime.dll
 └─ ui_zh-CN.json
@@ -62,7 +62,7 @@ RizomUV 2025.0\RizomUVChinese\
 2. 再次运行 `安装RizomUV汉化.exe`。
 3. 点击“拆卸汉化”。
 
-拆卸程序只会删除 `RizomUVChinese` 目录以及本补丁创建的桌面、开始菜单快捷方式，不会删除或修改 RizomUV 本体。
+拆卸程序只会删除 `ChineseLauncher` 目录以及本补丁创建的桌面、开始菜单快捷方式，不会删除或修改 RizomUV 本体。
 
 如果窗口已经关闭但后台仍有 `rizomuv.exe`，安装器会显示进程 PID，并询问是否强制结束。选择“是”可能导致尚未保存的数据丢失，请确认已经保存工程。
 
@@ -80,7 +80,7 @@ RizomUV 2025.0\RizomUVChinese\
 采集文件保存在：
 
 ```text
-C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_进程ID.jsonl
+C:\Program Files\Rizom Lab\RizomUV 2025.0\ChineseLauncher\missing_ui_text_进程ID.jsonl
 ```
 
 每次启动 RizomUV 会使用当前进程 ID 生成独立文件。用户路径、显卡名称、许可证机器指纹等动态内容不应加入正式词库。
@@ -126,7 +126,7 @@ C:\Program Files\Rizom Lab\RizomUV 2025.0\RizomUVChinese\missing_ui_text_进程I
 ### 安装后仍是英文
 
 - 确认使用的是“RizomUV 简体中文版”快捷方式，而不是原版快捷方式。
-- 确认 `RizomUVChinese` 目录中的三个文件完整存在。
+- 确认 `ChineseLauncher` 目录中的三个文件完整存在。
 - 查看同目录下的 `RizomUVChineseRuntime.log`。
 - 如果只有少数位置是英文，请使用 `Shift + ~` 采集漏词。
 

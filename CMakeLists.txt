@@ -61,13 +61,20 @@ target_compile_definitions(RizomUVChineseInstaller PRIVATE
   UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_link_libraries(RizomUVChineseInstaller PRIVATE
   user32 shell32 ole32 comctl32 advapi32)
-file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/installer_payload_$<CONFIG>.rc" CONTENT
+set(RIZOMUV_INSTALLER_PAYLOAD_RC
+  "${CMAKE_CURRENT_BINARY_DIR}/installer_payload_$<CONFIG>.rc")
+file(GENERATE OUTPUT "${RIZOMUV_INSTALLER_PAYLOAD_RC}" CONTENT
 "201 RCDATA \"$<TARGET_FILE:RizomUVChineseLauncher>\"
 202 RCDATA \"$<TARGET_FILE:RizomUVChineseRuntime>\"
 203 RCDATA \"${CMAKE_CURRENT_SOURCE_DIR}/plugin/translations/ui_zh-CN.json\"
 ")
 target_sources(RizomUVChineseInstaller PRIVATE
-  "${CMAKE_CURRENT_BINARY_DIR}/installer_payload_$<CONFIG>.rc")
+  "${RIZOMUV_INSTALLER_PAYLOAD_RC}")
+# Ninja may otherwise compile the generated resource while the payload
+# binaries are still being linked.  Resource compilation needs the files,
+# not merely target-level ordering.
+set_source_files_properties("${RIZOMUV_INSTALLER_PAYLOAD_RC}" PROPERTIES
+  OBJECT_DEPENDS "$<TARGET_FILE:RizomUVChineseLauncher>;$<TARGET_FILE:RizomUVChineseRuntime>")
 add_dependencies(RizomUVChineseInstaller RizomUVChineseLauncher RizomUVChineseRuntime)
 
 if(MSVC)

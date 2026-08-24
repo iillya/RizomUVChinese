@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <shellapi.h>
+#include <tlhelp32.h>
 
 #include <filesystem>
 #include <iostream>
@@ -16,12 +17,45 @@ std::filesystem::path LauncherDirectory() {
 
 std::wstring Quote(const std::wstring& value) { return L"\"" + value + L"\""; }
 
+LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
+    HMODULE localKernel = GetModuleHandleW(L"kernel32.dll");
+    FARPROC localFunction = localKernel
+        ? GetProcAddress(localKernel, "LoadLibraryW") : nullptr;
+    if (!localFunction) return nullptr;
+
+    const uintptr_t offset = reinterpret_cast<uintptr_t>(localFunction) -
+                             reinterpret_cast<uintptr_t>(localKernel);
+    HANDLE snapshot = CreateToolhelp32Snapshot(
+        TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, processId);
+    if (snapshot == INVALID_HANDLE_VALUE)
+        return reinterpret_cast<LPTHREAD_START_ROUTINE>(localFunction);
+
+    LPTHREAD_START_ROUTINE result = nullptr;
+    MODULEENTRY32W module{};
+    module.dwSize = sizeof(module);
+    if (Module32FirstW(snapshot, &module)) {
+        do {
+            if (_wcsicmp(module.szModule, L"kernel32.dll") == 0) {
+                result = reinterpret_cast<LPTHREAD_START_ROUTINE>(
+                    reinterpret_cast<uintptr_t>(module.modBaseAddr) + offset);
+                break;
+            }
+        } while (Module32NextW(snapshot, &module));
+    }
+    CloseHandle(snapshot);
+    // System DLLs normally share an address within the same Windows boot.
+    // Keep that compatibility fallback for suspended processes whose module
+    // list cannot yet be enumerated.
+    return result ? result
+                  : reinterpret_cast<LPTHREAD_START_ROUTINE>(localFunction);
+}
+
 std::filesystem::path FindInstalledRizomUV() {
     const std::filesystem::path launcherDirectory = LauncherDirectory();
     const std::filesystem::path besideLauncher = launcherDirectory / L"rizomuv.exe";
     if (std::filesystem::is_regular_file(besideLauncher)) return besideLauncher;
 
-    // 一键安装器把启动器放在 RizomUV\RizomUVChinese 中。
+    // 一键安装器把启动器放在 RizomUV\ChineseLauncher 中。
     const std::filesystem::path besidePlugin = launcherDirectory.parent_path() / L"rizomuv.exe";
     if (std::filesystem::is_regular_file(besidePlugin)) return besidePlugin;
 
@@ -37,9 +71,7 @@ bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtime
     if (!remotePath) { error = L"无法在目标进程分配路径内存"; return false; }
     bool success = false;
     if (WriteProcessMemory(process, remotePath, path.c_str(), bytes, nullptr)) {
-        HMODULE kernel = GetModuleHandleW(L"kernel32.dll");
-        auto loadLibrary = reinterpret_cast<LPTHREAD_START_ROUTINE>(
-            GetProcAddress(kernel, "LoadLibraryW"));
+        auto loadLibrary = ResolveRemoteLoadLibrary(GetProcessId(process));
         if (loadLibrary) {
             HANDLE thread = CreateRemoteThread(process, nullptr, 0, loadLibrary, remotePath,
                                                0, nullptr);

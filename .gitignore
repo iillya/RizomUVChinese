@@ -32,6 +32,8 @@
 *.app
 
 # Local probe builds and generated reports
+__pycache__/
+*.pyc
 .tools/
 build/
 build-*/

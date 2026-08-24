@@ -26,8 +26,7 @@ constexpr int kBrowseButton = 1002;
 constexpr int kInstallButton = 1003;
 constexpr int kUninstallButton = 1004;
 constexpr wchar_t kTitle[] = L"RizomUV 简体中文补丁";
-constexpr wchar_t kPluginFolder[] = L"RizomUVChinese";
-constexpr wchar_t kLegacyPluginFolder[] = L"ChineseLocalizer";
+constexpr wchar_t kPluginFolder[] = L"ChineseLauncher";
 
 struct PayloadEntry {
     const wchar_t* name = nullptr;
@@ -462,8 +461,8 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
     std::vector<PayloadEntry> entries;
     if (!LoadPayloadResources(entries)) { message = L"安装包资源不完整。"; return false; }
     const auto pluginDirectory = rizomDirectory / kPluginFolder;
-    const auto stagingDirectory = rizomDirectory / L"RizomUVChinese.installing";
-    const auto backupDirectory = rizomDirectory / L"RizomUVChinese.previous";
+    const auto stagingDirectory = rizomDirectory / L"ChineseLauncher.installing";
+    const auto backupDirectory = rizomDirectory / L"ChineseLauncher.previous";
     std::error_code filesystemError;
     if (!std::filesystem::exists(pluginDirectory) &&
         std::filesystem::exists(backupDirectory)) {
@@ -527,8 +526,9 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
         return false;
     }
     if (hadPrevious) std::filesystem::remove_all(backupDirectory, filesystemError);
-    // 清理本项目早期测试版使用的旧目录名。
-    std::filesystem::remove_all(rizomDirectory / kLegacyPluginFolder, filesystemError);
+    // 清理本项目早期版本使用的目录名。
+    for (const auto* legacy : {L"RizomUVChinese", L"ChineseLocalizer"})
+        std::filesystem::remove_all(rizomDirectory / legacy, filesystemError);
     const auto launcher = pluginDirectory / L"RizomUVChineseLauncher.exe";
     for (const auto& shortcut : ShortcutPaths()) {
         std::error_code ignored;
@@ -555,7 +555,10 @@ bool Uninstall(const std::filesystem::path& rizomDirectory, std::wstring& messag
     const auto pluginDirectory = rizomDirectory / kPluginFolder;
     std::error_code error;
     std::filesystem::remove_all(pluginDirectory, error);
-    if (!error) std::filesystem::remove_all(rizomDirectory / kLegacyPluginFolder, error);
+    if (!error) std::filesystem::remove_all(rizomDirectory / L"RizomUVChinese", error);
+    if (!error) std::filesystem::remove_all(rizomDirectory / L"ChineseLocalizer", error);
+    if (!error) std::filesystem::remove_all(rizomDirectory / L"ChineseLauncher.installing", error);
+    if (!error) std::filesystem::remove_all(rizomDirectory / L"ChineseLauncher.previous", error);
     if (!error) std::filesystem::remove_all(rizomDirectory / L"RizomUVChinese.installing", error);
     if (!error) std::filesystem::remove_all(rizomDirectory / L"RizomUVChinese.previous", error);
     if (error || std::filesystem::exists(pluginDirectory)) {
