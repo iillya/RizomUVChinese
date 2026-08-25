@@ -156,8 +156,8 @@ RizomUV 2025.0.104 词库目前包含 3835 条映射，其中包括中文译文�
 需要 Visual Studio 2022、CMake 和 Windows x64 工具链。
 
 ```powershell
-cmake -S . -B build-msvc -G "Visual Studio 17 2022" -A x64
-cmake --build build-msvc --config Release --target RizomUVOneClickPackage
+cmake -S . -B build/obj -G "Visual Studio 17 2022" -A x64
+cmake --build build/obj --config Release --target RizomUVOneClickPackage
 ```
 
 生成的单文件安装包位于：

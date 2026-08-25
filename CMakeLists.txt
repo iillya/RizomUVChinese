@@ -1,6 +1,20 @@
 cmake_minimum_required(VERSION 3.20)
 project(RizomUVChinese LANGUAGES CXX)
 
+# Match the other localizers: build/out contains deliverable binaries while
+# build/obj contains CMake/MSBuild projects, objects, caches and import libs.
+set(RIZOMUV_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build/out")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${RIZOMUV_OUTPUT_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${RIZOMUV_OUTPUT_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/build/obj/lib")
+foreach(CONFIG Debug Release RelWithDebInfo MinSizeRel)
+  string(TOUPPER "${CONFIG}" CONFIG_UPPER)
+  set("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER}" "${RIZOMUV_OUTPUT_DIR}")
+  set("CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER}" "${RIZOMUV_OUTPUT_DIR}")
+  set("CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/build/obj/lib")
+endforeach()
+
 set(LOCALIZER_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 add_library(RizomUVChineseRuntime SHARED
