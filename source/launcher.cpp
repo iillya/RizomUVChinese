@@ -28,7 +28,8 @@ LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
                              reinterpret_cast<uintptr_t>(localKernel);
     HANDLE snapshot = CreateToolhelp32Snapshot(
         TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, processId);
-    if (snapshot == INVALID_HANDLE_VALUE) return nullptr;
+    if (snapshot == INVALID_HANDLE_VALUE)
+        return reinterpret_cast<LPTHREAD_START_ROUTINE>(localFunction);
 
     LPTHREAD_START_ROUTINE result = nullptr;
     MODULEENTRY32W module{};
@@ -43,7 +44,11 @@ LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
         } while (Module32NextW(snapshot, &module));
     }
     CloseHandle(snapshot);
-    return result;
+    // A newly created suspended process can temporarily reject module
+    // snapshots. Both processes have the same architecture and share the
+    // boot-time system DLL mapping, so retain the stable compatibility path.
+    return result ? result
+                  : reinterpret_cast<LPTHREAD_START_ROUTINE>(localFunction);
 }
 
 std::filesystem::path FindInstalledRizomUV() {
