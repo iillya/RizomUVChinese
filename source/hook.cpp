@@ -30,7 +30,7 @@ DWORD WINAPI InitializeLocalizer(void*) {
     RuntimeLog(L"RizomUV 中文运行时开始初始化");
 
     std::wstring error;
-    const std::filesystem::path dictionaryPath = directory / L"ui_zh-CN.json";
+    const std::filesystem::path dictionaryPath = directory / L"dictionary_zh.json";
     if (!g_dictionary.Load(dictionaryPath, error)) {
         RuntimeLog(L"词库加载失败，保持英文运行：" + error);
         return 1;

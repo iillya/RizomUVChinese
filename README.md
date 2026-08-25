@@ -45,7 +45,7 @@ C:\Program Files\Rizom Lab\RizomUV 2025.0
 RizomUV 2025.0\ChineseLauncher\
 ├─ RizomUVChineseLauncher.exe
 ├─ RizomUVChineseRuntime.dll
-└─ ui_zh-CN.json
+└─ dictionary_zh.json
 ```
 
 原版 RizomUV 文件不会被替换。
@@ -146,7 +146,7 @@ C:\Program Files\Rizom Lab\RizomUV 2025.0\ChineseLauncher\missing_ui_text_进程
 正式词库位于：
 
 ```text
-plugin\translations\ui_zh-CN.json
+translations\dictionary_zh.json
 ```
 
 RizomUV 2025.0.104 词库目前包含 3835 条映射，其中包括中文译文，以及必须保持原样的快捷键、单位和产品名称。
@@ -169,12 +169,12 @@ dist\安装RizomUV汉化.exe
 项目主要目录：
 
 ```text
-plugin\source\                             补丁、启动器与安装器源码
-plugin\translations\                       正式运行词库
-plugin\resources\                          程序图标资源
-plugin\development\diagnostics\            开发期探测工具
-plugin\development\tools\                  词库整理工具
-plugin\development\translation_catalogs\   提取、分类与翻译记录
+source\                                    补丁、启动器与安装器源码
+translations\                              正式运行词库与翻译记录
+icon\                                      程序图标资源
+scripts\diagnostics\                       开发期探测工具
+scripts\extraction\                        静态文本提取工具
+scripts\                                   词库整理与校验工具
 dist\                                      发布安装包
 ```
 

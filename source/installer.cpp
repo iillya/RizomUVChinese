@@ -190,7 +190,7 @@ bool LoadPayloadResources(std::vector<PayloadEntry>& entries) {
     for (const auto& resource : {
              std::pair{kLauncherResource, L"RizomUVChineseLauncher.exe"},
              std::pair{kRuntimeResource, L"RizomUVChineseRuntime.dll"},
-             std::pair{kDictionaryResource, L"ui_zh-CN.json"}}) {
+             std::pair{kDictionaryResource, L"dictionary_zh.json"}}) {
         const HRSRC handle = FindResourceW(module, MAKEINTRESOURCEW(resource.first), RT_RCDATA);
         if (!handle) return false;
         const HGLOBAL loaded = LoadResource(module, handle);
@@ -489,7 +489,7 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
         return false;
     }
     for (const auto* required : {L"RizomUVChineseLauncher.exe", L"RizomUVChineseRuntime.dll",
-                                  L"ui_zh-CN.json"}) {
+                                  L"dictionary_zh.json"}) {
         if (!std::filesystem::is_regular_file(stagingDirectory / required)) {
             std::filesystem::remove_all(stagingDirectory, filesystemError);
             message = L"安装文件自检失败，原汉化未被修改。";
