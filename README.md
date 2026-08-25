@@ -6,7 +6,7 @@
 
 ## 下载与安装
 
-普通用户只需下载 Releases 中的 `安装RizomUV汉化.exe`。
+普通用户只需下载 Releases 中的 `RizomUVChineseInstaller.exe`。
 
 1. 保存工程并关闭 RizomUV。
 2. 运行安装器；出现系统权限提示时选择“是”。
@@ -106,7 +106,7 @@ cmake -S . -B build/obj -G "Visual Studio 17 2022" -A x64
 cmake --build build/obj --config Release --target RizomUVOneClickPackage
 ```
 
-生成的单文件安装器位于 `dist\安装RizomUV汉化.exe`。
+生成的单文件安装器位于 `dist\RizomUVChineseInstaller.exe`。
 
 ```text
 source\          运行时、启动器和安装器源码

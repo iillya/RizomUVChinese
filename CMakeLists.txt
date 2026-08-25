@@ -83,6 +83,6 @@ add_custom_target(RizomUVOneClickPackage
     "${CMAKE_CURRENT_SOURCE_DIR}/dist"
   COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "$<TARGET_FILE:RizomUVChineseInstaller>"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dist/安装RizomUV汉化.exe"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dist/RizomUVChineseInstaller.exe"
   DEPENDS RizomUVChineseInstaller RizomUVChineseLauncher RizomUVChineseRuntime
   VERBATIM)
