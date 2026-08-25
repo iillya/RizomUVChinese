@@ -12,6 +12,7 @@ namespace {
 std::filesystem::path LauncherDirectory() {
     std::vector<wchar_t> path(32768);
     const DWORD length = GetModuleFileNameW(nullptr, path.data(), static_cast<DWORD>(path.size()));
+    if (!length || length >= path.size()) return {};
     return std::filesystem::path(std::wstring(path.data(), length)).parent_path();
 }
 
@@ -27,8 +28,7 @@ LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
                              reinterpret_cast<uintptr_t>(localKernel);
     HANDLE snapshot = CreateToolhelp32Snapshot(
         TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, processId);
-    if (snapshot == INVALID_HANDLE_VALUE)
-        return reinterpret_cast<LPTHREAD_START_ROUTINE>(localFunction);
+    if (snapshot == INVALID_HANDLE_VALUE) return nullptr;
 
     LPTHREAD_START_ROUTINE result = nullptr;
     MODULEENTRY32W module{};
@@ -43,11 +43,7 @@ LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
         } while (Module32NextW(snapshot, &module));
     }
     CloseHandle(snapshot);
-    // System DLLs normally share an address within the same Windows boot.
-    // Keep that compatibility fallback for suspended processes whose module
-    // list cannot yet be enumerated.
-    return result ? result
-                  : reinterpret_cast<LPTHREAD_START_ROUTINE>(localFunction);
+    return result;
 }
 
 std::filesystem::path FindInstalledRizomUV() {
@@ -70,6 +66,7 @@ bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtime
                                       PAGE_READWRITE);
     if (!remotePath) { error = L"无法在目标进程分配路径内存"; return false; }
     bool success = false;
+    bool remoteThreadCompleted = false;
     if (WriteProcessMemory(process, remotePath, path.c_str(), bytes, nullptr)) {
         auto loadLibrary = ResolveRemoteLoadLibrary(GetProcessId(process));
         if (loadLibrary) {
@@ -77,6 +74,7 @@ bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtime
                                                0, nullptr);
             if (thread) {
                 if (WaitForSingleObject(thread, 10000) == WAIT_OBJECT_0) {
+                    remoteThreadCompleted = true;
                     DWORD result = 0;
                     success = GetExitCodeThread(thread, &result) && result != 0;
                 }
@@ -84,7 +82,10 @@ bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtime
             }
         }
     }
-    VirtualFreeEx(process, remotePath, 0, MEM_RELEASE);
+    // If the remote thread timed out it may still be reading the DLL path.
+    // The caller terminates the suspended process on failure, so leave this
+    // allocation to process teardown rather than creating a use-after-free.
+    if (remoteThreadCompleted) VirtualFreeEx(process, remotePath, 0, MEM_RELEASE);
     if (!success) error = L"目标进程未能加载中文运行时";
     return success;
 }
@@ -125,15 +126,17 @@ int RunLauncher(int argc, wchar_t** argv) {
 
     std::wstring error;
     const bool loaded = LoadRuntimeIntoProcess(process.hProcess, runtimePath, error);
-    if (loaded) {
-        ResumeThread(process.hThread);
-    } else {
+    bool started = false;
+    if (loaded)
+        started = ResumeThread(process.hThread) != static_cast<DWORD>(-1);
+    if (!started) {
         TerminateProcess(process.hProcess, 1);
+        if (error.empty()) error = L"无法恢复 RizomUV 主线程";
         std::wcerr << error << L"。为避免不完整状态，RizomUV 未启动。\n";
     }
     CloseHandle(process.hThread);
     CloseHandle(process.hProcess);
-    return loaded ? 0 : 5;
+    return started ? 0 : 5;
 }
 
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {

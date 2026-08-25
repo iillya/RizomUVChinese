@@ -4,16 +4,8 @@
 #include "rizomuv_localizer/translation_dictionary.h"
 
 #include <winnt.h>
-#include <shellapi.h>
 
-#include <algorithm>
 #include <atomic>
-#include <cstdio>
-#include <cstdint>
-#include <filesystem>
-#include <mutex>
-#include <unordered_map>
-#include <vector>
 
 namespace rizomuv::localizer {
 namespace {
@@ -34,46 +26,6 @@ GetTextExtentExPointWFn g_getTextExtentExPointW = nullptr;
 const TranslationDictionary* g_dictionary = nullptr;
 thread_local std::wstring g_translatedText;
 std::atomic<unsigned long long> g_translationHits{0};
-std::filesystem::path g_missingTextPath;
-std::mutex g_missingTextMutex;
-std::atomic<bool> g_missingTextDirty{false};
-std::atomic<bool> g_missingTextCaptureStarted{false};
-std::atomic<ULONGLONG> g_missingTextCaptureUntil{0};
-std::atomic<ULONGLONG> g_missingTextCaptureGeneration{0};
-std::atomic<bool> g_hotkeyRegistrationSucceeded{false};
-
-constexpr int kCaptureHotkeyId = 1;
-constexpr ULONGLONG kCaptureDurationMilliseconds = 1500;
-constexpr DWORD kCaptureCompletionDelayMilliseconds = 1750;
-
-struct MissingTextEntry {
-    std::wstring text;
-    unsigned long long count = 0;
-    unsigned int apiMask = 0;
-};
-
-std::unordered_map<std::wstring, MissingTextEntry> g_missingTexts;
-
-unsigned int ApiMask(const wchar_t* api) {
-    if (wcscmp(api, L"DrawTextExW") == 0) return 1u;
-    if (wcscmp(api, L"DrawTextW") == 0) return 2u;
-    if (wcscmp(api, L"TextOutW") == 0) return 4u;
-    if (wcscmp(api, L"ExtTextOutW") == 0) return 8u;
-    if (wcscmp(api, L"GetTextExtentPoint32W") == 0) return 16u;
-    if (wcscmp(api, L"GetTextExtentExPointW") == 0) return 32u;
-    return 0;
-}
-
-bool IsMissingTextCandidate(const std::wstring& text) {
-    if (text.size() < 2 || text.size() > 8192) return false;
-    bool hasLatinLetter = false;
-    for (wchar_t character : text) {
-        if ((character >= L'A' && character <= L'Z') ||
-            (character >= L'a' && character <= L'z')) hasLatinLetter = true;
-        if (character == L'\0') return false;
-    }
-    return hasLatinLetter;
-}
 
 bool ShouldLookupTranslation(LPCWSTR text, int length) {
     if (!text || length <= 0) return false;
@@ -97,212 +49,48 @@ bool ShouldLookupTranslation(LPCWSTR text, int length) {
     return hasLatinLetter;
 }
 
-std::string Utf8(const std::wstring& value) {
-    if (value.empty()) return {};
-    const int size = WideCharToMultiByte(CP_UTF8, 0, value.data(),
-        static_cast<int>(value.size()), nullptr, 0, nullptr, nullptr);
-    if (size <= 0) return {};
-    std::string output(static_cast<size_t>(size), '\0');
-    WideCharToMultiByte(CP_UTF8, 0, value.data(), static_cast<int>(value.size()),
-        output.data(), size, nullptr, nullptr);
-    return output;
-}
-
-std::string JsonEscape(const std::wstring& value) {
-    const std::string utf8 = Utf8(value);
-    std::string output;
-    output.reserve(utf8.size() + 16);
-    for (unsigned char character : utf8) {
-        switch (character) {
-        case '\\': output += "\\\\"; break;
-        case '"': output += "\\\""; break;
-        case '\b': output += "\\b"; break;
-        case '\f': output += "\\f"; break;
-        case '\n': output += "\\n"; break;
-        case '\r': output += "\\r"; break;
-        case '\t': output += "\\t"; break;
-        default:
-            if (character < 0x20) {
-                char escaped[7]{};
-                std::snprintf(escaped, sizeof(escaped), "\\u%04x", character);
-                output += escaped;
-            } else output.push_back(static_cast<char>(character));
-        }
-    }
-    return output;
-}
-
-void CaptureMissingText(const wchar_t* api, const std::wstring& source) {
-    if (!g_missingTextCaptureStarted.load(std::memory_order_relaxed) ||
-        GetTickCount64() > g_missingTextCaptureUntil.load(std::memory_order_relaxed) ||
-        !IsMissingTextCandidate(source)) return;
-    // This runs in RizomUV's drawing path: never stall rendering for telemetry.
-    std::unique_lock<std::mutex> lock(g_missingTextMutex, std::try_to_lock);
-    if (!lock.owns_lock()) return;
-    auto [position, inserted] = g_missingTexts.try_emplace(source);
-    MissingTextEntry& entry = position->second;
-    if (inserted) entry.text = source;
-    ++entry.count;
-    entry.apiMask |= ApiMask(api);
-    g_missingTextDirty.store(true, std::memory_order_release);
-}
-
-std::string ApiJson(unsigned int mask) {
-    static constexpr struct { unsigned int bit; const char* name; } apis[] = {
-        {1u, "DrawTextExW"}, {2u, "DrawTextW"}, {4u, "TextOutW"},
-        {8u, "ExtTextOutW"}, {16u, "GetTextExtentPoint32W"},
-        {32u, "GetTextExtentExPointW"},
-    };
-    std::string output = "[";
-    bool first = true;
-    for (const auto& api : apis) {
-        if (!(mask & api.bit)) continue;
-        if (!first) output += ',';
-        output += '"';
-        output += api.name;
-        output += '"';
-        first = false;
-    }
-    return output + ']';
-}
-
-bool WriteMissingTextSnapshot() {
-    if (g_missingTextPath.empty()) return false;
-    std::vector<MissingTextEntry> snapshot;
-    {
-        std::lock_guard<std::mutex> lock(g_missingTextMutex);
-        snapshot.reserve(g_missingTexts.size());
-        for (const auto& item : g_missingTexts) snapshot.push_back(item.second);
-    }
-    std::sort(snapshot.begin(), snapshot.end(), [](const auto& left, const auto& right) {
-        return left.text < right.text;
-    });
-    const std::filesystem::path temporary = g_missingTextPath.wstring() + L".tmp";
-    FILE* file = nullptr;
-    if (_wfopen_s(&file, temporary.c_str(), L"wb") != 0 || !file) return false;
-    bool written = true;
-    for (const auto& entry : snapshot) {
-        const std::string line = "{\"text\":\"" + JsonEscape(entry.text) +
-            "\",\"count\":" + std::to_string(entry.count) +
-            ",\"apis\":" + ApiJson(entry.apiMask) + "}\n";
-        if (std::fwrite(line.data(), 1, line.size(), file) != line.size()) {
-            written = false;
-            break;
-        }
-    }
-    if (std::fclose(file) != 0) written = false;
-    if (!written || !MoveFileExW(temporary.c_str(), g_missingTextPath.c_str(),
-                                 MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
-        DeleteFileW(temporary.c_str());
-        return false;
-    }
-    return true;
-}
-
-DWORD WINAPI CompleteMissingTextCapture(void* generationValue) {
-    const ULONGLONG generation = static_cast<ULONGLONG>(
-        reinterpret_cast<std::uintptr_t>(generationValue));
-    Sleep(kCaptureCompletionDelayMilliseconds);
-    bool writeFailureLogged = false;
-    for (;;) {
-        if (generation != g_missingTextCaptureGeneration.load(
-                              std::memory_order_acquire))
-            return 0;
-        const bool dirty = g_missingTextDirty.exchange(
-            false, std::memory_order_acq_rel);
-        if (!dirty || WriteMissingTextSnapshot()) {
-            const std::filesystem::path outputDirectory =
-                g_missingTextPath.parent_path();
-            RuntimeLog(L"UI 漏词探测完成，正在打开输出目录");
-            ShellExecuteW(nullptr, L"open", outputDirectory.c_str(),
-                          nullptr, nullptr, SW_SHOWNORMAL);
-            return 0;
-        }
-        g_missingTextDirty.store(true, std::memory_order_release);
-        if (!writeFailureLogged) {
-            RuntimeLog(L"漏词文件写入失败，将继续重试：" +
-                       g_missingTextPath.wstring());
-            writeFailureLogged = true;
-        }
-        Sleep(1000);
-    }
-}
-
-DWORD WINAPI MissingTextCaptureThread(void* readyEventValue) {
-    const bool registered = RegisterHotKey(nullptr, kCaptureHotkeyId,
-        MOD_SHIFT | MOD_NOREPEAT, VK_OEM_3) != FALSE;
-    g_hotkeyRegistrationSucceeded.store(registered, std::memory_order_release);
-    SetEvent(static_cast<HANDLE>(readyEventValue));
-    if (!registered) return 1;
-
-    MSG message{};
-    while (GetMessageW(&message, nullptr, 0, 0) > 0) {
-        if (message.message == WM_HOTKEY &&
-            message.wParam == static_cast<WPARAM>(kCaptureHotkeyId)) {
-            g_missingTextCaptureUntil.store(
-                GetTickCount64() + kCaptureDurationMilliseconds,
-                std::memory_order_release);
-            const ULONGLONG generation =
-                g_missingTextCaptureGeneration.fetch_add(
-                    1, std::memory_order_acq_rel) + 1;
-            HANDLE completionThread = CreateThread(
-                nullptr, 0, CompleteMissingTextCapture,
-                reinterpret_cast<void*>(static_cast<std::uintptr_t>(generation)),
-                0, nullptr);
-            if (completionThread) CloseHandle(completionThread);
-            else RuntimeLog(L"无法启动 UI 漏词探测完成线程");
-            RuntimeLog(L"已触发 UI 漏词探测：持续 1.5 秒");
-        }
-    }
-    UnregisterHotKey(nullptr, kCaptureHotkeyId);
-    return 0;
-}
-
 struct TextView { LPCWSTR text; int length; };
 
-TextView Translate(const wchar_t* api, LPCWSTR text, int length) {
+TextView Translate(LPCWSTR text, int length) {
     if (!g_dictionary || !text) return {text, length};
     if (length < 0) length = static_cast<int>(wcsnlen_s(text, 65536));
     if (length <= 0 || length > 65535) return {text, length};
     if (!ShouldLookupTranslation(text, length)) return {text, length};
     const std::wstring source(text, text + length);
     const std::wstring* translated = g_dictionary->Find(source);
-    if (!translated) {
-        CaptureMissingText(api, source);
-        return {text, length};
-    }
+    if (!translated) return {text, length};
     g_translationHits.fetch_add(1, std::memory_order_relaxed);
     g_translatedText = *translated;
     return {g_translatedText.c_str(), static_cast<int>(g_translatedText.size())};
 }
 
 int WINAPI HookDrawTextW(HDC dc, LPCWSTR text, int count, LPRECT rect, UINT format) {
-    const TextView value = Translate(L"DrawTextW", text, count);
+    const TextView value = Translate(text, count);
     return g_drawTextW(dc, value.text, value.length, rect, format);
 }
 int WINAPI HookDrawTextExW(HDC dc, LPWSTR text, int count, LPRECT rect, UINT format, LPDRAWTEXTPARAMS params) {
-    const TextView value = Translate(L"DrawTextExW", text, count);
+    const TextView value = Translate(text, count);
     return g_drawTextExW(dc, const_cast<LPWSTR>(value.text), value.length, rect, format, params);
 }
 BOOL WINAPI HookTextOutW(HDC dc, int x, int y, LPCWSTR text, int count) {
-    const TextView value = Translate(L"TextOutW", text, count);
+    const TextView value = Translate(text, count);
     return g_textOutW(dc, x, y, value.text, value.length);
 }
 BOOL WINAPI HookExtTextOutW(HDC dc, int x, int y, UINT options, const RECT* rect,
                             LPCWSTR text, UINT count, const INT* spacing) {
-    const TextView value = Translate(L"ExtTextOutW", text, static_cast<int>(count));
+    const TextView value = Translate(text, static_cast<int>(count));
     // Character spacing is only valid for the original glyph sequence.
     const INT* translatedSpacing = value.text == text ? spacing : nullptr;
     return g_extTextOutW(dc, x, y, options, rect, value.text,
                          static_cast<UINT>(value.length), translatedSpacing);
 }
 BOOL WINAPI HookGetTextExtentPoint32W(HDC dc, LPCWSTR text, int count, LPSIZE size) {
-    const TextView value = Translate(L"GetTextExtentPoint32W", text, count);
+    const TextView value = Translate(text, count);
     return g_getTextExtentPoint32W(dc, value.text, value.length, size);
 }
 BOOL WINAPI HookGetTextExtentExPointW(HDC dc, LPCWSTR text, int count, int maxExtent,
                                       LPINT fit, LPINT dx, LPSIZE size) {
-    const TextView value = Translate(L"GetTextExtentExPointW", text, count);
+    const TextView value = Translate(text, count);
     return g_getTextExtentExPointW(dc, value.text, value.length, maxExtent, fit, dx, size);
 }
 
@@ -318,45 +106,6 @@ bool PatchSlot(void** slot, void* replacement, void** original) {
 }
 
 } // namespace
-
-bool StartMissingTextCapture(const std::filesystem::path& outputDirectory,
-                             std::wstring& error) {
-    bool expected = false;
-    if (!g_missingTextCaptureStarted.compare_exchange_strong(expected, true)) return true;
-    std::error_code filesystemError;
-    std::filesystem::create_directories(outputDirectory, filesystemError);
-    if (filesystemError) {
-        g_missingTextCaptureStarted.store(false);
-        error = L"无法创建漏词采集目录";
-        return false;
-    }
-    g_missingTextPath = outputDirectory /
-        (L"missing_ui_text_" + std::to_wstring(GetCurrentProcessId()) + L".jsonl");
-    HANDLE readyEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-    if (!readyEvent) {
-        g_missingTextCaptureStarted.store(false);
-        error = L"无法创建漏词探测同步事件";
-        return false;
-    }
-    HANDLE thread = CreateThread(nullptr, 0, MissingTextCaptureThread,
-                                 readyEvent, 0, nullptr);
-    if (!thread) {
-        CloseHandle(readyEvent);
-        g_missingTextCaptureStarted.store(false);
-        error = L"无法启动漏词探测线程";
-        return false;
-    }
-    const DWORD ready = WaitForSingleObject(readyEvent, INFINITE);
-    CloseHandle(readyEvent);
-    CloseHandle(thread);
-    if (ready != WAIT_OBJECT_0 ||
-        !g_hotkeyRegistrationSucceeded.load(std::memory_order_acquire)) {
-        g_missingTextCaptureStarted.store(false);
-        error = L"无法注册 Shift + ~ 漏词探测快捷键";
-        return false;
-    }
-    return true;
-}
 
 bool InstallGdiIatHooks(HMODULE targetModule, const TranslationDictionary* dictionary,
                         std::wstring& error) {
@@ -403,11 +152,6 @@ bool InstallGdiIatHooks(HMODULE targetModule, const TranslationDictionary* dicti
 
 unsigned long long GetGdiTranslationHitCount() {
     return g_translationHits.load(std::memory_order_relaxed);
-}
-
-size_t GetMissingTextCount() {
-    std::lock_guard<std::mutex> lock(g_missingTextMutex);
-    return g_missingTexts.size();
 }
 
 } // namespace rizomuv::localizer

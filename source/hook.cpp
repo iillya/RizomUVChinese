@@ -20,6 +20,7 @@ std::filesystem::path RuntimeDirectory() {
     std::vector<wchar_t> path(32768);
     const DWORD length = GetModuleFileNameW(g_runtimeModule, path.data(),
                                              static_cast<DWORD>(path.size()));
+    if (!length || length >= path.size()) return {};
     return std::filesystem::path(std::wstring(path.data(), length)).parent_path();
 }
 
@@ -36,12 +37,6 @@ DWORD WINAPI InitializeLocalizer(void*) {
         return 1;
     }
     RuntimeLog(L"已加载词条：" + std::to_wstring(g_dictionary.Size()));
-
-    if (StartMissingTextCapture(directory, error))
-        RuntimeLog(L"UI 漏词探测已就绪：按 Shift + ~ 触发 1.5 秒，输出目录：" +
-                   directory.wstring());
-    else
-        RuntimeLog(L"漏词采集启动失败：" + error);
 
     if (!InstallGdiIatHooks(GetModuleHandleW(nullptr), &g_dictionary, error)) {
         RuntimeLog(L"GDI Hook 安装失败，保持英文运行：" + error);
@@ -60,7 +55,6 @@ DWORD WINAPI InitializeLocalizer(void*) {
     }
     RuntimeLog(L"原生菜单翻译操作次数：" + std::to_wstring(totalMenus));
     RuntimeLog(L"GDI 翻译命中次数：" + std::to_wstring(GetGdiTranslationHitCount()));
-    RuntimeLog(L"GDI 未命中唯一词条：" + std::to_wstring(GetMissingTextCount()));
     RuntimeLog(L"RizomUV 中文运行时初始化完成");
     return 0;
 }

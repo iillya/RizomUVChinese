@@ -15,8 +15,9 @@ std::wstring Utf8ToWide(const std::string& input) {
                                           static_cast<int>(input.size()), nullptr, 0);
     if (count <= 0) return {};
     std::wstring output(static_cast<size_t>(count), L'\0');
-    MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, input.data(),
-                        static_cast<int>(input.size()), output.data(), count);
+    if (MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, input.data(),
+                            static_cast<int>(input.size()), output.data(), count) != count)
+        return {};
     return output;
 }
 
@@ -45,6 +46,8 @@ public:
             if (Consume(L'}')) break;
             if (!Consume(L',')) return Fail(L"词库字段之间缺少逗号", error);
         }
+        SkipWhitespace();
+        if (position_ != source_.size()) return Fail(L"词库根节点后包含多余数据", error);
         if (output.empty()) return Fail(L"词库没有有效翻译", error);
         return true;
     }
@@ -64,6 +67,7 @@ private:
         while (position_ < source_.size()) {
             wchar_t ch = source_[position_++];
             if (ch == L'"') return true;
+            if (ch < 0x20) return false;
             if (ch != L'\\') { output += ch; continue; }
             if (position_ >= source_.size()) return false;
             ch = source_[position_++];

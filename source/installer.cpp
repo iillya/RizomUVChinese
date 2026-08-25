@@ -521,8 +521,8 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
         if (hadPrevious && !rollbackError)
             std::filesystem::rename(backupDirectory, pluginDirectory, rollbackError);
         message = rollbackError
-            ? L"无法设置漏词探测文件的写入权限，且自动回滚失败。"
-            : L"无法设置漏词探测文件的写入权限，已恢复安装前状态。";
+            ? L"无法设置汉化目录访问权限，且自动回滚失败。"
+            : L"无法设置汉化目录访问权限，已恢复安装前状态。";
         return false;
     }
     if (hadPrevious) std::filesystem::remove_all(backupDirectory, filesystemError);
@@ -530,16 +530,20 @@ bool Install(const std::filesystem::path& rizomDirectory, std::wstring& message)
     for (const auto* legacy : {L"RizomUVChinese", L"ChineseLocalizer"})
         std::filesystem::remove_all(rizomDirectory / legacy, filesystemError);
     const auto launcher = pluginDirectory / L"RizomUVChineseLauncher.exe";
+    bool shortcutFailed = false;
     for (const auto& shortcut : ShortcutPaths()) {
         std::error_code ignored;
         std::filesystem::create_directories(shortcut.parent_path(), ignored);
         if (!CreateShortcut(shortcut, launcher, rizomDirectory)) {
-            message = L"汉化文件已安装，但创建快捷方式失败。";
-            return false;
+            shortcutFailed = true;
+            continue;
         }
         GrantShortcutAccess(shortcut);
     }
-    message = L"汉化安装完成。\n\n桌面和开始菜单已创建“RizomUV 简体中文版”快捷方式。\n以后请通过该快捷方式启动。";
+    message = shortcutFailed
+        ? L"汉化安装完成，但部分快捷方式创建失败。\n"
+          L"可直接运行 ChineseLauncher\\RizomUVChineseLauncher.exe。"
+        : L"汉化安装完成。\n\n桌面和开始菜单已创建“RizomUV 简体中文版”快捷方式。\n以后请通过该快捷方式启动。";
     return true;
 }
 
