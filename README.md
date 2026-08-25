@@ -170,11 +170,8 @@ dist\安装RizomUV汉化.exe
 
 ```text
 source\                                    补丁、启动器与安装器源码
-translations\                              正式运行词库与翻译记录
+translations\                              正式运行词库
 icon\                                      程序图标资源
-scripts\diagnostics\                       开发期探测工具
-scripts\extraction\                        静态文本提取工具
-scripts\                                   词库整理与校验工具
 dist\                                      发布安装包
 ```
 

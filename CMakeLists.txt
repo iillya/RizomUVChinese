@@ -1,32 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(RizomUVChinese LANGUAGES CXX)
 
-add_executable(RizomUVUiProbe EXCLUDE_FROM_ALL scripts/diagnostics/interface_probe.cpp)
-target_compile_features(RizomUVUiProbe PRIVATE cxx_std_17)
-target_compile_definitions(RizomUVUiProbe PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN
-  _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-target_link_libraries(RizomUVUiProbe PRIVATE user32 ole32 oleaut32 uiautomationcore)
-
-if(MSVC)
-  target_compile_options(RizomUVUiProbe PRIVATE /W4 /permissive- /utf-8)
-endif()
-
-add_library(RizomUVTextSniffer SHARED EXCLUDE_FROM_ALL scripts/diagnostics/text_rendering_sniffer.cpp)
-target_compile_features(RizomUVTextSniffer PRIVATE cxx_std_17)
-target_compile_definitions(RizomUVTextSniffer PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
-target_link_libraries(RizomUVTextSniffer PRIVATE user32 gdi32)
-set_target_properties(RizomUVTextSniffer PROPERTIES PREFIX "")
-
-add_executable(RizomUVSnifferLauncher EXCLUDE_FROM_ALL scripts/diagnostics/text_sniffer_launcher.cpp)
-target_compile_features(RizomUVSnifferLauncher PRIVATE cxx_std_17)
-target_compile_definitions(RizomUVSnifferLauncher PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
-target_link_libraries(RizomUVSnifferLauncher PRIVATE user32)
-
-if(MSVC)
-  target_compile_options(RizomUVTextSniffer PRIVATE /W4 /permissive- /utf-8)
-  target_compile_options(RizomUVSnifferLauncher PRIVATE /W4 /permissive- /utf-8)
-endif()
-
 set(LOCALIZER_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source")
 
 add_library(RizomUVChineseRuntime SHARED
