@@ -42,3 +42,7 @@ rizomuv-ui*.json
 rizomuv-localized-ui.json
 RizomUV_text_sniffer.jsonl
 .translation-runtime/
+
+# Release artifacts under dist are versioned.
+!/dist/
+!/dist/**
