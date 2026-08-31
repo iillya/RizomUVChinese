@@ -41,36 +41,9 @@ target_compile_definitions(RizomUVChineseLauncher PRIVATE
   UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_link_libraries(RizomUVChineseLauncher PRIVATE user32 shell32)
 
-add_executable(RizomUVChineseInstaller WIN32
-  source/installer.cpp
-  ${RIZOMUV_EXECUTABLE_ICON_RESOURCE})
-target_compile_features(RizomUVChineseInstaller PRIVATE cxx_std_17)
-target_compile_definitions(RizomUVChineseInstaller PRIVATE
-  UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
-target_link_libraries(RizomUVChineseInstaller PRIVATE
-  user32 shell32 ole32 comctl32 advapi32)
-set(RIZOMUV_INSTALLER_PAYLOAD_RC
-  "${CMAKE_CURRENT_BINARY_DIR}/installer_payload_$<CONFIG>.rc")
-file(GENERATE OUTPUT "${RIZOMUV_INSTALLER_PAYLOAD_RC}" CONTENT
-"201 RCDATA \"$<TARGET_FILE:RizomUVChineseLauncher>\"
-202 RCDATA \"$<TARGET_FILE:RizomUVChineseRuntime>\"
-203 RCDATA \"${CMAKE_CURRENT_SOURCE_DIR}/translations/dictionary_zh.json\"
-")
-target_sources(RizomUVChineseInstaller PRIVATE
-  "${RIZOMUV_INSTALLER_PAYLOAD_RC}")
-# Ninja may otherwise compile the generated resource while the payload
-# binaries are still being linked.  Resource compilation needs the files,
-# not merely target-level ordering.
-set_source_files_properties("${RIZOMUV_INSTALLER_PAYLOAD_RC}" PROPERTIES
-  OBJECT_DEPENDS "$<TARGET_FILE:RizomUVChineseLauncher>;$<TARGET_FILE:RizomUVChineseRuntime>")
-add_dependencies(RizomUVChineseInstaller RizomUVChineseLauncher RizomUVChineseRuntime)
-
 if(MSVC)
   target_compile_options(RizomUVChineseRuntime PRIVATE /W4 /permissive- /utf-8)
   target_compile_options(RizomUVChineseLauncher PRIVATE /W4 /permissive- /utf-8)
-  target_compile_options(RizomUVChineseInstaller PRIVATE /W4 /permissive- /utf-8)
-  target_link_options(RizomUVChineseInstaller PRIVATE
-    "/MANIFESTUAC:level='requireAdministrator' uiAccess='false'")
 endif()
 
 add_custom_command(TARGET RizomUVChineseRuntime POST_BUILD
@@ -79,10 +52,7 @@ add_custom_command(TARGET RizomUVChineseRuntime POST_BUILD
     "$<TARGET_FILE_DIR:RizomUVChineseRuntime>/dictionary_zh.json")
 
 add_custom_target(RizomUVOneClickPackage
-  COMMAND ${CMAKE_COMMAND} -E make_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/dist"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "$<TARGET_FILE:RizomUVChineseInstaller>"
-    "${CMAKE_CURRENT_SOURCE_DIR}/dist/RizomUVChineseInstaller.exe"
-  DEPENDS RizomUVChineseInstaller RizomUVChineseLauncher RizomUVChineseRuntime
+  COMMAND cmd /c "${CMAKE_CURRENT_SOURCE_DIR}/source/build_inno.bat" --package-only
+  DEPENDS RizomUVChineseLauncher RizomUVChineseRuntime
+  COMMENT "Packaging with source/inno/package.py (Inno Setup)"
   VERBATIM)

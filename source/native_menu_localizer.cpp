@@ -45,10 +45,10 @@ size_t TranslateMenuTree(HMENU menu, const TranslationDictionary& dictionary) {
 
 struct MenuContext { DWORD pid; const TranslationDictionary* dictionary; size_t count; };
 
-constexpr wchar_t kAuthorText[] = L"Bilibili神说要凑数汉化";
+constexpr wchar_t kAuthorText[] = L"Bilibili 神说要凑数汉化";
 constexpr wchar_t kAuthorUrl[] =
     L"https://space.bilibili.com/281243426?spm_id_from=333.1007.0.0";
-constexpr wchar_t kGitHubText[] = L"Github仓库";
+constexpr wchar_t kGitHubText[] = L"GitHub 仓库";
 constexpr wchar_t kGitHubUrl[] = L"https://github.com/iillya/RizomUVChinese";
 constexpr COLORREF kLinkTextColor = RGB(102, 170, 255);
 constexpr COLORREF kLinkTransparentColor = RGB(1, 2, 3);

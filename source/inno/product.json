@@ -1,0 +1,17 @@
+{
+  "product": "RizomUV",
+  "exe": "rizomuv.exe",
+  "default": "Rizom Lab\\RizomUV 2025.0",
+  "icon": "rizomuv.ico",
+  "qt": [],
+  "modules": [],
+  "handlers": [],
+  "extensions": [],
+  "legacy": [],
+  "payload": {
+    "RizomUVChineseRuntime.dll": "build/out/RizomUVChineseRuntime.dll",
+    "RizomUVChineseLauncher.exe": "build/out/RizomUVChineseLauncher.exe",
+    "dictionary_zh.json": "translations/dictionary_zh.json"
+  },
+  "id": "RizomUVChinese"
+}
