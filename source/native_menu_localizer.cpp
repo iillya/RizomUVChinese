@@ -26,10 +26,11 @@ size_t TranslateMenuTree(HMENU menu, const TranslationDictionary& dictionary, un
         if (info.hSubMenu) translatedCount += TranslateMenuTree(info.hSubMenu, dictionary, depth + 1);
         if (info.fType & (MFT_OWNERDRAW | MFT_SEPARATOR)) continue;
         if (info.cch >= std::size(buffer) - 1) continue;
-        const std::wstring source(buffer, info.cch);
+        const std::wstring_view source(buffer, info.cch);
         const size_t shortcutOffset = source.find(L'\t');
-        const std::wstring label = source.substr(0, shortcutOffset);
+        const auto label = source.substr(0, shortcutOffset);
         if (const std::wstring* translated = dictionary.Find(label)) {
+            if (*translated == label) continue;
             std::wstring replacementText = *translated;
             if (shortcutOffset != std::wstring::npos)
                 replacementText += source.substr(shortcutOffset);
@@ -309,11 +310,12 @@ void PositionCreditWindows() {
 }
 
 void CALLBACK CreditEventCallback(HWINEVENTHOOK, DWORD, HWND window,
-                                   LONG, LONG, DWORD, DWORD) {
-    DWORD processId = 0;
-    GetWindowThreadProcessId(window, &processId);
-    if (processId == GetCurrentProcessId() && window != g_authorWindow &&
-        window != g_gitHubWindow && g_authorWindow && !g_positionPending.exchange(true))
+                                   LONG object, LONG child, DWORD, DWORD) {
+    // SetWinEventHook already scopes events to this process. Child-control
+    // scrolling, caret movement and tooltips cannot move the top-level band.
+    if (window != g_mainWindow || child != CHILDID_SELF ||
+        (object != OBJID_WINDOW && object != OBJID_CLIENT) || !g_authorWindow) return;
+    if (!g_positionPending.exchange(true))
         if (!PostMessageW(g_authorWindow, WM_APP + 1, 0, 0)) g_positionPending.store(false);
 }
 

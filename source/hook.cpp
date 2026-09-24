@@ -36,25 +36,36 @@ void RefreshApplicationModules(const std::wstring& root) {
         if (!EnumProcessModules(GetCurrentProcess(), modules.data(), needed, &needed)) return;
     }
     const size_t count = (std::min)(modules.size(), static_cast<size_t>(needed / sizeof(HMODULE)));
-    for (size_t i = 0; i < count; ++i) {
-        if (modules[i] == g_runtimeModule) continue;
-        HMODULE held = nullptr;
-        if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-                               reinterpret_cast<LPCWSTR>(modules[i]), &held)) continue;
-        wchar_t path[32768]{};
-        const DWORD length = GetModuleFileNameW(held, path, 32768);
-        if (length > root.size() && length < 32768 &&
+    // The API writes the returned path and terminator. Do not clear 64 KiB
+    // for every module on every scan.
+    wchar_t path[32768];
+    auto isApplicationModule = [&](HMODULE module) {
+        const DWORD length = GetModuleFileNameW(module, path, 32768);
+        return length > root.size() && length < 32768 &&
             CompareStringOrdinal(path, static_cast<int>(root.size()), root.c_str(),
-                                 static_cast<int>(root.size()), TRUE) == CSTR_EQUAL) {
+                                 static_cast<int>(root.size()), TRUE) == CSTR_EQUAL;
+    };
+    for (size_t i = 0; i < count; ++i) {
+        if (modules[i] == g_runtimeModule || !isApplicationModule(modules[i])) continue;
+        struct ModuleReference {
+            HMODULE value = nullptr;
+            ~ModuleReference() { if (value) FreeLibrary(value); }
+        } held;
+        if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+                               reinterpret_cast<LPCWSTR>(modules[i]), &held.value)) continue;
+        // The module may unload/reload at the same address between enumeration
+        // and acquisition. Recheck while holding its reference before touching IAT.
+        if (isApplicationModule(held.value)) {
             std::wstring error;
-            rizomuv::localizer::InstallGdiIatHooks(held, &g_dictionary, error);
+            rizomuv::localizer::InstallGdiIatHooks(held.value, &g_dictionary, error);
         }
-        FreeLibrary(held);
     }
 }
 
 DWORD InitializeLocalizerImpl() {
     using namespace rizomuv::localizer;
+    // One deadline for the entire startup window, including the menu phase.
+    const ULONGLONG scanDeadline = GetTickCount64() + 120000;
     const std::filesystem::path directory = RuntimeDirectory();
     InitializeRuntimeLog(directory);
     RuntimeLog(L"RizomUV 中文运行时开始初始化");
@@ -67,7 +78,7 @@ DWORD InitializeLocalizerImpl() {
     }
     RuntimeLog(L"已加载词条：" + std::to_wstring(g_dictionary.Size()));
 
-    // IAT callbacks and the worker remain valid for the process lifetime.
+    // IAT callbacks and dictionary remain valid after the startup worker exits.
     HMODULE pinned = nullptr;
     if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
                            reinterpret_cast<LPCWSTR>(g_runtimeModule), &pinned)) return 3;
@@ -85,21 +96,25 @@ DWORD InitializeLocalizerImpl() {
 
     // Menus are created during startup. Re-scan briefly without touching other controls.
     size_t totalMenus = 0;
-    for (int pass = 0; pass < 40 && g_running.load(); ++pass) {
+    for (int pass = 0; pass < 40 && g_running.load() && GetTickCount64() < scanDeadline; ++pass) {
         if (pass % 8 == 0) RefreshApplicationModules(hostRoot);
         totalMenus += TranslateNativeMenus(GetCurrentProcessId(), g_dictionary);
         Sleep(250);
     }
     RuntimeLog(L"原生菜单翻译操作次数：" + std::to_wstring(totalMenus));
-    RuntimeLog(L"GDI 翻译命中次数：" + std::to_wstring(GetGdiTranslationHitCount()));
+    RuntimeLog(L"GDI 翻译命中次数：" + std::to_wstring(FinishGdiStartupDiagnostics()));
     RuntimeLog(L"RizomUV 中文运行时初始化完成");
-    // Covers application DLLs and delay imports first used after startup.
+    // Cover late startup modules/delay imports only within the first 120 seconds.
     // Only scan application-directory modules; do not patch Windows modules.
     LARGE_INTEGER frequency{}, accumulated{};
     QueryPerformanceFrequency(&frequency);
     unsigned samples = 0;
     while (g_running.load()) {
-        Sleep(2000);
+        const ULONGLONG now = GetTickCount64();
+        if (now >= scanDeadline) break;
+        Sleep(static_cast<DWORD>((std::min)(2000ULL, scanDeadline - now)));
+        // Check after waking so no new scan starts at/after the deadline.
+        if (!g_running.load() || GetTickCount64() >= scanDeadline) break;
         LARGE_INTEGER begin{}, end{};
         QueryPerformanceCounter(&begin);
         RefreshApplicationModules(hostRoot);
@@ -111,6 +126,8 @@ DWORD InitializeLocalizerImpl() {
                     std::to_wstring(accumulated.QuadPart * 1000000 / frequency.QuadPart / samples));
         }
     }
+    if (g_running.load())
+        RuntimeLog(L"启动后 120 秒模块扫描窗口已结束，扫描线程退出；已接入的汉化继续生效");
     return 0;
 }
 

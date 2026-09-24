@@ -27,8 +27,8 @@ ExtTextOutWFn g_extTextOutW = nullptr;
 GetTextExtentPoint32WFn g_getTextExtentPoint32W = nullptr;
 GetTextExtentExPointWFn g_getTextExtentExPointW = nullptr;
 const TranslationDictionary* g_dictionary = nullptr;
-thread_local std::wstring g_lookupText;
 std::atomic<unsigned long long> g_translationHits{0};
+std::atomic<bool> g_countStartupHits{true};
 
 bool ShouldLookupTranslation(LPCWSTR text, int length) {
     if (!text || length <= 0) return false;
@@ -60,15 +60,13 @@ TextView Translate(LPCWSTR text, int length) noexcept {
     if (length == -1) length = static_cast<int>(wcsnlen_s(text, 65536));
     if (length <= 0 || length > 65535) return original;
     if (!ShouldLookupTranslation(text, length)) return original;
-    try {
-        g_lookupText.assign(text, static_cast<size_t>(length));
-        const std::wstring* translated = g_dictionary->Find(g_lookupText);
-        if (!translated) return original;
+    const auto* translated = g_dictionary->Find(std::wstring_view(text, static_cast<size_t>(length)));
+    if (!translated) return original;
+    if (g_countStartupHits.load(std::memory_order_relaxed))
         g_translationHits.fetch_add(1, std::memory_order_relaxed);
-        // Dictionary storage is immutable after initialization. No per-hit copy,
-        // and recursive painting cannot invalidate an outer call's translation.
-        return {translated->c_str(), static_cast<int>(translated->size())};
-    } catch (...) { return original; }
+    // Immutable storage: no allocation or per-thread growing buffer, and a
+    // recursive call cannot invalidate an outer call's translation.
+    return {translated->c_str(), static_cast<int>(translated->size())};
 }
 
 int WINAPI HookDrawTextW(HDC dc, LPCWSTR text, int count, LPRECT rect, UINT format) {
@@ -167,7 +165,8 @@ bool InstallGdiIatHooks(HMODULE targetModule, const TranslationDictionary* dicti
     return active != 0;
 }
 
-unsigned long long GetGdiTranslationHitCount() {
+unsigned long long FinishGdiStartupDiagnostics() {
+    g_countStartupHits.store(false, std::memory_order_relaxed);
     return g_translationHits.load(std::memory_order_relaxed);
 }
 

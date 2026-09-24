@@ -10,6 +10,6 @@ class TranslationDictionary;
 
 bool InstallGdiIatHooks(HMODULE targetModule, const TranslationDictionary* dictionary,
                         std::wstring& error);
-unsigned long long GetGdiTranslationHitCount();
+unsigned long long FinishGdiStartupDiagnostics();
 
 } // namespace rizomuv::localizer

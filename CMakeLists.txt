@@ -29,7 +29,7 @@ add_library(RizomUVChineseRuntime SHARED
   source/native_menu_localizer.cpp
   source/runtime_log.cpp)
 target_include_directories(RizomUVChineseRuntime PRIVATE "${LOCALIZER_INCLUDE_DIR}")
-target_compile_features(RizomUVChineseRuntime PRIVATE cxx_std_17)
+target_compile_features(RizomUVChineseRuntime PRIVATE cxx_std_20)
 target_compile_definitions(RizomUVChineseRuntime PRIVATE
   UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_link_libraries(RizomUVChineseRuntime PRIVATE user32 gdi32 shell32)
@@ -65,9 +65,19 @@ add_custom_target(RizomUVOneClickPackage
 add_executable(RizomUVCompatibilityTests EXCLUDE_FROM_ALL
   source/tests/compatibility.cpp source/translation_dictionary.cpp source/runtime_log.cpp)
 target_include_directories(RizomUVCompatibilityTests PRIVATE "${LOCALIZER_INCLUDE_DIR}")
-target_compile_features(RizomUVCompatibilityTests PRIVATE cxx_std_17)
+target_compile_features(RizomUVCompatibilityTests PRIVATE cxx_std_20)
 target_compile_definitions(RizomUVCompatibilityTests PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
 target_link_libraries(RizomUVCompatibilityTests PRIVATE user32 gdi32 shell32)
 if(MSVC)
   target_compile_options(RizomUVCompatibilityTests PRIVATE /W4 /WX /utf-8)
+endif()
+
+add_executable(RizomUVPerformanceTests EXCLUDE_FROM_ALL
+  source/tests/performance.cpp source/translation_dictionary.cpp source/runtime_log.cpp)
+target_include_directories(RizomUVPerformanceTests PRIVATE "${LOCALIZER_INCLUDE_DIR}")
+target_compile_features(RizomUVPerformanceTests PRIVATE cxx_std_20)
+target_compile_definitions(RizomUVPerformanceTests PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
+target_link_libraries(RizomUVPerformanceTests PRIVATE user32 gdi32)
+if(MSVC)
+  target_compile_options(RizomUVPerformanceTests PRIVATE /W4 /WX /utf-8)
 endif()

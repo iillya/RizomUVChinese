@@ -24,7 +24,7 @@ class JsonReader {
 public:
     explicit JsonReader(const std::wstring& source) : source_(source) {}
 
-    bool ReadTranslations(std::unordered_map<std::wstring, std::wstring>& output,
+    bool ReadTranslations(TranslationMap& output,
                           std::wstring& error) {
         SkipWhitespace();
         if (!Consume(L'{')) return Fail(L"词库根节点必须是对象", error);
@@ -110,7 +110,7 @@ private:
         }
         return false;
     }
-    bool ReadStringMap(std::unordered_map<std::wstring, std::wstring>& output) {
+    bool ReadStringMap(TranslationMap& output) {
         if (!Consume(L'{')) return false;
         std::unordered_set<std::wstring> keys;
         SkipWhitespace();
@@ -194,14 +194,14 @@ bool TranslationDictionary::Load(const std::filesystem::path& path, std::wstring
         bytes.erase(0, 3);
     const std::wstring json = Utf8ToWide(bytes);
     if (json.empty()) { error = L"词库不是有效的 UTF-8 文件"; return false; }
-    std::unordered_map<std::wstring, std::wstring> parsed;
+    TranslationMap parsed;
     JsonReader reader(json);
     if (!reader.ReadTranslations(parsed, error)) return false;
     translations_ = std::move(parsed);
     return true;
 }
 
-const std::wstring* TranslationDictionary::Find(const std::wstring& source) const {
+const std::wstring* TranslationDictionary::Find(std::wstring_view source) const noexcept {
     const auto found = translations_.find(source);
     return found == translations_.end() ? nullptr : &found->second;
 }

@@ -2,6 +2,7 @@
 #undef NDEBUG
 #endif
 #include "../gdi_iat_hooks.cpp"
+#include "../native_menu_localizer.cpp"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -102,10 +103,59 @@ void TestDictionaryAndArguments() {
     assert(HookDrawTextW(nullptr, mutableText, 3, nullptr, DT_MODIFYSTRING));
     assert(mutableText[0] == L'Z');
 
+    wchar_t slice[] = {L'A', L'B', L'C', L'X'};
+    assert(dictionary.Find(std::wstring_view(slice, 3)) == dictionary.Find(L"ABC"));
+    assert(!dictionary.Find(std::wstring_view(slice, 4)));
+    const auto countBefore = FinishGdiStartupDiagnostics();
+    for (int i = 0; i < 1000; ++i) assert(Translate(L"ABC", 3).length == 7);
+    assert(g_translationHits.load() == countBefore);
+    HMENU menu = CreateMenu();
+    assert(menu && AppendMenuW(menu, MF_STRING, 1, L"ABC\tCtrl+A"));
+    assert(TranslateMenuTree(menu, dictionary) == 1);
+    wchar_t label[128]{};
+    GetMenuStringW(menu, 0, label, 128, MF_BYPOSITION);
+    assert(std::wstring(label) == L"更长的中文测试\tCtrl+A");
+    assert(TranslateMenuTree(menu, dictionary) == 0);
+    DestroyMenu(menu);
     g_dictionary = nullptr;
 }
+void TestCreditEventFiltering() {
+    using namespace rizomuv::localizer;
+    const HWND main = CreateWindowExW(0, L"STATIC", L"", 0, 0, 0, 0, 0,
+        HWND_MESSAGE, nullptr, GetModuleHandleW(nullptr), nullptr);
+    const HWND author = CreateWindowExW(0, L"STATIC", L"", 0, 0, 0, 0, 0,
+        HWND_MESSAGE, nullptr, GetModuleHandleW(nullptr), nullptr);
+    assert(main && author);
+    g_mainWindow = main;
+    g_authorWindow = author;
+    g_positionPending.store(false);
+    for (int i = 0; i < 10000; ++i) {
+        CreditEventCallback(nullptr, EVENT_OBJECT_LOCATIONCHANGE, author,
+            OBJID_WINDOW, CHILDID_SELF, 0, 0);
+        CreditEventCallback(nullptr, EVENT_OBJECT_LOCATIONCHANGE, main,
+            OBJID_CARET, CHILDID_SELF, 0, 0);
+    }
+    assert(!g_positionPending.load());
+    for (int i = 0; i < 10000; ++i)
+        CreditEventCallback(nullptr, EVENT_OBJECT_LOCATIONCHANGE, main,
+            OBJID_WINDOW, CHILDID_SELF, 0, 0);
+    MSG message{};
+    assert(g_positionPending.load());
+    assert(PeekMessageW(&message, author, WM_APP + 1, WM_APP + 1, PM_REMOVE));
+    assert(!PeekMessageW(&message, author, WM_APP + 1, WM_APP + 1, PM_REMOVE));
+    g_positionPending.store(false);
+    CreditEventCallback(nullptr, EVENT_OBJECT_LOCATIONCHANGE, main,
+        OBJID_CLIENT, CHILDID_SELF, 0, 0);
+    assert(PeekMessageW(&message, author, WM_APP + 1, WM_APP + 1, PM_REMOVE));
+    DestroyWindow(author);
+    DestroyWindow(main);
+    g_mainWindow = g_authorWindow = nullptr;
+    g_positionPending.store(false);
+}
+
 int main(int argc, char** argv) {
     TestDictionaryAndArguments();
+    TestCreditEventFiltering();
     using namespace rizomuv::localizer;
     if (argc > 1) {
         TranslationDictionary official;
