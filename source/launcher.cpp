@@ -1,9 +1,9 @@
 #include <windows.h>
 #include <shellapi.h>
 #include <tlhelp32.h>
+#include "rizomuv_localizer/command_line.h"
 
 #include <filesystem>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -16,7 +16,9 @@ std::filesystem::path LauncherDirectory() {
     return std::filesystem::path(std::wstring(path.data(), length)).parent_path();
 }
 
-std::wstring Quote(const std::wstring& value) { return L"\"" + value + L"\""; }
+void ShowError(const std::wstring& message) {
+    MessageBoxW(nullptr, message.c_str(), L"RizomUV 中文补丁", MB_OK | MB_ICONERROR);
+}
 
 LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
     HMODULE localKernel = GetModuleHandleW(L"kernel32.dll");
@@ -24,8 +26,14 @@ LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
         ? GetProcAddress(localKernel, "LoadLibraryW") : nullptr;
     if (!localFunction) return nullptr;
 
-    const uintptr_t offset = reinterpret_cast<uintptr_t>(localFunction) -
-                             reinterpret_cast<uintptr_t>(localKernel);
+    // LoadLibraryW can be forwarded to another system module.
+    HMODULE owner = nullptr;
+    if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           reinterpret_cast<LPCWSTR>(localFunction), &owner)) return nullptr;
+    wchar_t ownerPath[32768]{};
+    if (!GetModuleFileNameW(owner, ownerPath, 32768)) return nullptr;
+    const auto ownerName = std::filesystem::path(ownerPath).filename().wstring();
+    const uintptr_t offset = reinterpret_cast<uintptr_t>(localFunction) - reinterpret_cast<uintptr_t>(owner);
     HANDLE snapshot = CreateToolhelp32Snapshot(
         TH32CS_SNAPMODULE | TH32CS_SNAPMODULE32, processId);
     if (snapshot == INVALID_HANDLE_VALUE)
@@ -36,7 +44,7 @@ LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
     module.dwSize = sizeof(module);
     if (Module32FirstW(snapshot, &module)) {
         do {
-            if (_wcsicmp(module.szModule, L"kernel32.dll") == 0) {
+            if (_wcsicmp(module.szModule, ownerName.c_str()) == 0) {
                 result = reinterpret_cast<LPTHREAD_START_ROUTINE>(
                     reinterpret_cast<uintptr_t>(module.modBaseAddr) + offset);
                 break;
@@ -60,7 +68,7 @@ std::filesystem::path FindInstalledRizomUV() {
     const std::filesystem::path besidePlugin = launcherDirectory.parent_path() / L"rizomuv.exe";
     if (std::filesystem::is_regular_file(besidePlugin)) return besidePlugin;
 
-    return L"C:\\Program Files\\Rizom Lab\\RizomUV 2025.0\\rizomuv.exe";
+    return besidePlugin; // Report the missing installation instead of guessing a version.
 }
 
 bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtimePath,
@@ -98,24 +106,26 @@ bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtime
 } // namespace
 
 int RunLauncher(int argc, wchar_t** argv) {
-    const std::filesystem::path rizomuvExecutable = argc > 1
-        ? std::filesystem::path(argv[1])
-        : FindInstalledRizomUV();
+    const bool explicitHost = argc > 1 &&
+        _wcsicmp(std::filesystem::path(argv[1]).filename().c_str(), L"rizomuv.exe") == 0;
+    const auto rizomuvExecutable = std::filesystem::absolute(explicitHost
+        ? std::filesystem::path(argv[1]) : FindInstalledRizomUV());
     const std::filesystem::path runtimePath = LauncherDirectory() / L"RizomUVChineseRuntime.dll";
     const std::filesystem::path dictionaryPath = LauncherDirectory() / L"dictionary_zh.json";
 
     if (!std::filesystem::is_regular_file(rizomuvExecutable)) {
-        std::wcerr << L"找不到 RizomUV：" << rizomuvExecutable.wstring() << L"\n";
+        ShowError(L"找不到 RizomUV：" + rizomuvExecutable.wstring());
         return 2;
     }
     if (!std::filesystem::is_regular_file(runtimePath) ||
         !std::filesystem::is_regular_file(dictionaryPath)) {
-        std::wcerr << L"中文运行时或词库不完整，请重新构建/安装补丁。\n";
+        ShowError(L"中文运行时或词库不完整，请重新安装补丁。");
         return 3;
     }
 
-    std::wstring commandLine = Quote(rizomuvExecutable.wstring());
-    for (int index = 2; index < argc; ++index) commandLine += L" " + Quote(argv[index]);
+    std::wstring commandLine = rizomuv::localizer::QuoteArgument(rizomuvExecutable.wstring());
+    for (int index = explicitHost ? 2 : 1; index < argc; ++index)
+        commandLine += L" " + rizomuv::localizer::QuoteArgument(argv[index]);
     std::vector<wchar_t> mutableCommand(commandLine.begin(), commandLine.end());
     mutableCommand.push_back(L'\0');
 
@@ -125,10 +135,24 @@ int RunLauncher(int argc, wchar_t** argv) {
     if (!CreateProcessW(rizomuvExecutable.c_str(), mutableCommand.data(), nullptr, nullptr,
                         FALSE, CREATE_SUSPENDED, nullptr,
                         rizomuvExecutable.parent_path().c_str(), &startup, &process)) {
-        std::wcerr << L"启动 RizomUV 失败，错误码：" << GetLastError() << L"\n";
+        ShowError(L"启动 RizomUV 失败，错误码：" + std::to_wstring(GetLastError()));
         return 4;
     }
 
+    struct ProcessGuard {
+        PROCESS_INFORMATION info;
+        bool started = false;
+        ~ProcessGuard() {
+            if (!started) TerminateProcess(info.hProcess, 1);
+            CloseHandle(info.hThread);
+            CloseHandle(info.hProcess);
+        }
+    } guard{process};
+    BOOL wow64 = FALSE;
+    if (!IsWow64Process(process.hProcess, &wow64) || wow64) {
+        ShowError(L"中文补丁仅支持 Windows x64 版 RizomUV。");
+        return 5;
+    }
     std::wstring error;
     const bool loaded = LoadRuntimeIntoProcess(process.hProcess, runtimePath, error);
     bool started = false;
@@ -137,10 +161,9 @@ int RunLauncher(int argc, wchar_t** argv) {
     if (!started) {
         TerminateProcess(process.hProcess, 1);
         if (error.empty()) error = L"无法恢复 RizomUV 主线程";
-        std::wcerr << error << L"。为避免不完整状态，RizomUV 未启动。\n";
+        ShowError(error + L"。RizomUV 未启动。");
     }
-    CloseHandle(process.hThread);
-    CloseHandle(process.hProcess);
+    guard.started = started;
     return started ? 0 : 5;
 }
 
@@ -148,7 +171,9 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     int argc = 0;
     wchar_t** argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (!argv) return 1;
-    const int result = RunLauncher(argc, argv);
+    int result = 1;
+    try { result = RunLauncher(argc, argv); }
+    catch (...) { ShowError(L"启动器遇到异常，请检查软件路径与汉化文件是否完整。"); }
     LocalFree(argv);
     return result;
 }

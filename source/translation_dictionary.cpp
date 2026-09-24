@@ -3,8 +3,7 @@
 #include <windows.h>
 
 #include <fstream>
-#include <iterator>
-#include <vector>
+#include <unordered_set>
 
 namespace rizomuv::localizer {
 namespace {
@@ -29,23 +28,27 @@ public:
                           std::wstring& error) {
         SkipWhitespace();
         if (!Consume(L'{')) return Fail(L"词库根节点必须是对象", error);
-        while (true) {
-            SkipWhitespace();
-            if (Consume(L'}')) break;
-            std::wstring key;
-            if (!ReadString(key)) return Fail(L"无法读取词库字段名", error);
-            SkipWhitespace();
-            if (!Consume(L':')) return Fail(L"词库字段缺少冒号", error);
-            SkipWhitespace();
-            if (key == L"translations") {
-                if (!ReadStringMap(output)) return Fail(L"translations 必须是字符串映射", error);
-            } else if (!SkipValue()) {
-                return Fail(L"词库包含无法解析的字段", error);
+        std::unordered_set<std::wstring> fields;
+        SkipWhitespace();
+        if (position_ < source_.size() && source_[position_] != L'}') {
+            while (true) {
+                SkipWhitespace();
+                std::wstring key;
+                if (!ReadString(key) || !fields.insert(key).second) return Fail(L"无法读取词库字段名", error);
+                SkipWhitespace();
+                if (!Consume(L':')) return Fail(L"词库字段缺少冒号", error);
+                SkipWhitespace();
+                if (key == L"translations") {
+                    if (!ReadStringMap(output)) return Fail(L"translations 必须是字符串映射", error);
+                } else if (!SkipValue()) {
+                    return Fail(L"词库包含无法解析的字段", error);
+                }
+                SkipWhitespace();
+                if (position_ < source_.size() && source_[position_] == L'}') break;
+                if (!Consume(L',')) return Fail(L"词库字段之间缺少逗号", error);
             }
-            SkipWhitespace();
-            if (Consume(L'}')) break;
-            if (!Consume(L',')) return Fail(L"词库字段之间缺少逗号", error);
         }
+        if (!Consume(L'}')) return Fail(L"词库对象未结束", error);
         SkipWhitespace();
         if (position_ != source_.size()) return Fail(L"词库根节点后包含多余数据", error);
         if (output.empty()) return Fail(L"词库没有有效翻译", error);
@@ -54,7 +57,7 @@ public:
 
 private:
     void SkipWhitespace() {
-        while (position_ < source_.size() && iswspace(source_[position_])) ++position_;
+        while (position_ < source_.size() && (source_[position_] == L' ' || source_[position_] == L'\t' || source_[position_] == L'\r' || source_[position_] == L'\n')) ++position_;
     }
     bool Consume(wchar_t expected) {
         if (position_ >= source_.size() || source_[position_] != expected) return false;
@@ -66,7 +69,15 @@ private:
         output.clear();
         while (position_ < source_.size()) {
             wchar_t ch = source_[position_++];
-            if (ch == L'"') return true;
+            if (ch == L'"') {
+                for (size_t i = 0; i < output.size(); ++i) {
+                    const unsigned c = output[i];
+                    if (c >= 0xd800 && c <= 0xdbff) {
+                        if (++i == output.size() || output[i] < 0xdc00 || output[i] > 0xdfff) return false;
+                    } else if (c >= 0xdc00 && c <= 0xdfff) return false;
+                }
+                return true;
+            }
             if (ch < 0x20) return false;
             if (ch != L'\\') { output += ch; continue; }
             if (position_ >= source_.size()) return false;
@@ -101,46 +112,61 @@ private:
     }
     bool ReadStringMap(std::unordered_map<std::wstring, std::wstring>& output) {
         if (!Consume(L'{')) return false;
+        std::unordered_set<std::wstring> keys;
+        SkipWhitespace();
+        if (Consume(L'}')) return true;
         while (true) {
             SkipWhitespace();
-            if (Consume(L'}')) return true;
-            std::wstring source;
-            std::wstring translated;
-            if (!ReadString(source)) return false;
+            std::wstring source, translated;
+            if (!ReadString(source) || !keys.insert(source).second) return false;
             SkipWhitespace();
             if (!Consume(L':')) return false;
             SkipWhitespace();
             if (!ReadString(translated)) return false;
-            if (!source.empty() && !translated.empty()) output[source] = translated;
+            if (!source.empty() && !translated.empty()) output.emplace(std::move(source), std::move(translated));
             SkipWhitespace();
             if (Consume(L'}')) return true;
             if (!Consume(L',')) return false;
         }
     }
-    bool SkipValue() {
+    bool SkipValue(unsigned depth = 0) {
         SkipWhitespace();
-        if (position_ >= source_.size()) return false;
+        if (depth > 64 || position_ >= source_.size()) return false;
         if (source_[position_] == L'"') { std::wstring ignored; return ReadString(ignored); }
         if (source_[position_] == L'{' || source_[position_] == L'[') {
-            const wchar_t open = source_[position_++];
-            const wchar_t close = open == L'{' ? L'}' : L']';
-            int depth = 1;
-            bool quoted = false;
-            bool escaped = false;
-            while (position_ < source_.size() && depth > 0) {
-                const wchar_t ch = source_[position_++];
-                if (quoted) {
-                    if (escaped) escaped = false;
-                    else if (ch == L'\\') escaped = true;
-                    else if (ch == L'"') quoted = false;
-                } else if (ch == L'"') quoted = true;
-                else if (ch == open) ++depth;
-                else if (ch == close) --depth;
+            const bool object = source_[position_++] == L'{';
+            const wchar_t close = object ? L'}' : L']';
+            std::unordered_set<std::wstring> keys;
+            SkipWhitespace();
+            if (Consume(close)) return true;
+            while (true) {
+                SkipWhitespace();
+                if (object) {
+                    std::wstring key;
+                    if (!ReadString(key) || !keys.insert(key).second) return false;
+                    SkipWhitespace();
+                    if (!Consume(L':')) return false;
+                }
+                if (!SkipValue(depth + 1)) return false;
+                SkipWhitespace();
+                if (Consume(close)) return true;
+                if (!Consume(L',')) return false;
             }
-            return depth == 0;
         }
-        while (position_ < source_.size() && source_[position_] != L',' && source_[position_] != L'}')
-            ++position_;
+        for (const auto literal : {L"true", L"false", L"null"}) {
+            const size_t length = wcslen(literal);
+            if (source_.compare(position_, length, literal) == 0) { position_ += length; return true; }
+        }
+        Consume(L'-');
+        auto digit = [&] { return position_ < source_.size() && source_[position_] >= L'0' && source_[position_] <= L'9'; };
+        if (!digit()) return false;
+        if (!Consume(L'0')) while (digit()) ++position_;
+        if (Consume(L'.')) { if (!digit()) return false; while (digit()) ++position_; }
+        if (Consume(L'e') || Consume(L'E')) {
+            if (!Consume(L'+')) Consume(L'-');
+            if (!digit()) return false;
+            while (digit()) ++position_;
+        }
         return true;
     }
     bool Fail(const wchar_t* message, std::wstring& error) {
@@ -155,9 +181,14 @@ private:
 } // namespace
 
 bool TranslationDictionary::Load(const std::filesystem::path& path, std::wstring& error) {
-    std::ifstream file(path, std::ios::binary);
+    error.clear();
+    std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (!file) { error = L"无法打开词库：" + path.wstring(); return false; }
-    std::string bytes((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    const auto size = file.tellg();
+    if (size <= 0 || size > 64 * 1024 * 1024) { error = L"词库为空或超过 64 MiB"; return false; }
+    file.seekg(0);
+    std::string bytes(static_cast<size_t>(size), '\0');
+    if (!file.read(bytes.data(), static_cast<std::streamsize>(size))) { error = L"读取词库失败"; return false; }
     if (bytes.size() >= 3 && static_cast<unsigned char>(bytes[0]) == 0xEF &&
         static_cast<unsigned char>(bytes[1]) == 0xBB && static_cast<unsigned char>(bytes[2]) == 0xBF)
         bytes.erase(0, 3);

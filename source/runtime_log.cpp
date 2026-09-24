@@ -12,13 +12,30 @@ std::mutex g_logMutex;
 }
 
 void InitializeRuntimeLog(const std::filesystem::path& runtimeDirectory) {
-    std::error_code error;
-    std::filesystem::create_directories(runtimeDirectory, error);
-    if (error) {
-        g_logPath.clear();
-        return;
-    }
     g_logPath = runtimeDirectory / L"RizomUVChineseRuntime.log";
+    FILE* probe = nullptr;
+    if (_wfopen_s(&probe, g_logPath.c_str(), L"a, ccs=UTF-8") != 0 || !probe) {
+        wchar_t local[32768]{};
+        const DWORD length = GetEnvironmentVariableW(L"LOCALAPPDATA", local, 32768);
+        if (!length || length >= 32768) { g_logPath.clear(); return; }
+        const auto fallback = std::filesystem::path(local) / L"RizomUVChinese";
+        std::error_code error;
+        std::filesystem::create_directories(fallback, error);
+        if (error) { g_logPath.clear(); return; }
+        g_logPath = fallback / L"RizomUVChineseRuntime.log";
+    } else {
+        std::fclose(probe);
+    }
+    // Keep one previous log; no log IO is performed by the text drawing hooks.
+    std::error_code error;
+    const auto size = std::filesystem::file_size(g_logPath, error);
+    if (!error && size > 256 * 1024) {
+        auto previous = g_logPath;
+        previous += L".previous";
+        std::filesystem::remove(previous, error);
+        error.clear();
+        std::filesystem::rename(g_logPath, previous, error);
+    }
 }
 
 void RuntimeLog(const std::wstring& message) {

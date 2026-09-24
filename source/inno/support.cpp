@@ -1,14 +1,11 @@
-// Host validation, user-level command proxy and scoped legacy-association cleanup.
+// Validate the host and bound installation/uninstallation to its plugin directory.
 // No Qt dependency, process injection, process termination or shell execution.
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
 #include <tlhelp32.h>
-#include <sddl.h>
-#include <shlobj.h>
 #include <filesystem>
 #include <string>
-#include <vector>
 
 
 namespace {
@@ -47,7 +44,8 @@ bool amd64(const std::wstring& path) {
         count == sizeof(pe) && pe.Machine == IMAGE_FILE_MACHINE_AMD64;
 }
 
-#include "product_adapter.h"
+constexpr wchar_t kHostName[] = L"rizomuv.exe";
+constexpr wchar_t kLauncher[] = L"RizomUVChineseLauncher.exe";
 
 bool safePath(const std::wstring& root) {
     // A host directory, not a drive root, UNC share or Win32 device path.
@@ -92,7 +90,7 @@ bool hostStopped(const std::wstring& root) {
     item.dwSize = sizeof(item);
     if (!Process32FirstW(snapshot.value, &item)) return false;
     do {
-        if (_wcsicmp(item.szExeFile, hostName(root).c_str()) != 0 &&
+        if (_wcsicmp(item.szExeFile, kHostName) != 0 &&
             _wcsicmp(item.szExeFile, kLauncher) != 0) continue;
         Handle process(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, item.th32ProcessID));
         if (!process.value) {
@@ -102,45 +100,13 @@ bool hostStopped(const std::wstring& root) {
         wchar_t path[32768]{};
         DWORD length = 32768;
         if (!QueryFullProcessImageNameW(process.value, 0, path, &length)) return false;
-        if (_wcsicmp(path, (root + L"\\" + hostName(root)).c_str()) == 0 ||
+        if (_wcsicmp(path, (root + L"\\" + kHostName).c_str()) == 0 ||
             _wcsicmp(path, (root + L"\\ChineseLauncher\\" + kLauncher).c_str()) == 0) return false;
     } while (Process32NextW(snapshot.value, &item));
     return GetLastError() == ERROR_NO_MORE_FILES;
 }
 
-std::wstring interactiveSid() {
-    DWORD session = 0;
-    if (!ProcessIdToSessionId(GetCurrentProcessId(), &session)) return {};
-    Handle snapshot(CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0));
-    if (snapshot.value == INVALID_HANDLE_VALUE) return {};
-    PROCESSENTRY32W item{};
-    item.dwSize = sizeof(item);
-    if (!Process32FirstW(snapshot.value, &item)) return {};
-    do {
-        DWORD candidateSession = 0;
-        if (_wcsicmp(item.szExeFile, L"explorer.exe") != 0 ||
-            !ProcessIdToSessionId(item.th32ProcessID, &candidateSession) || candidateSession != session) continue;
-        Handle process(OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, item.th32ProcessID));
-        HANDLE rawToken = nullptr;
-        if (!process.value || !OpenProcessToken(process.value, TOKEN_QUERY, &rawToken)) continue;
-        Handle token(rawToken);
-        DWORD size = 0;
-        GetTokenInformation(token.value, TokenUser, nullptr, 0, &size);
-        if (!size || size > 65536) continue;
-        std::vector<BYTE> bytes(size);
-        if (!GetTokenInformation(token.value, TokenUser, bytes.data(), size, &size)) continue;
-        LPWSTR sid = nullptr;
-        if (!ConvertSidToStringSidW(reinterpret_cast<TOKEN_USER*>(bytes.data())->User.Sid, &sid)) continue;
-        const std::wstring result(sid);
-        LocalFree(sid);
-        return result;
-    } while (Process32NextW(snapshot.value, &item));
-    return {};
-}
-}
-
-#include "association_proxy.h"
-#include "legacy.h"
+} // namespace
 
 extern "C" __declspec(dllexport) BOOL __stdcall CheckTarget(
     const wchar_t* directory, BOOL checkVersion, wchar_t* message, unsigned capacity) {
@@ -152,102 +118,11 @@ extern "C" __declspec(dllexport) BOOL __stdcall CheckTarget(
         if (!safeTree(std::filesystem::path(root) / L"ChineseLauncher", 0, count))
             return fail(L"ChineseLauncher 内含目录链接、不可访问文件或超出检查上限，已停止操作。", message, capacity);
         if (checkVersion) {
-            if (!regularFile(root + L"\\" + hostName(root)) || !amd64(root + L"\\" + hostName(root)))
+            if (!regularFile(root + L"\\" + kHostName) || !amd64(root + L"\\" + kHostName))
                 return fail(L"请选择包含 x64 rizomuv.exe 的软件目录，不要选择 ChineseLauncher 子目录。", message, capacity);
-            if (!productQt(root)) return fail(L"目标 Qt 组件不完整或版本不兼容，请确认软件版本。", message, capacity);
         }
-        if (!productExtraPaths(root)) return fail(L"字体目录缺失或含有文件链接，已停止操作。", message, capacity);
         if (!hostStopped(root))
             return fail(L"RizomUV 或中文启动器正在运行，或无法确认进程状态。请保存工程并正常退出后重试。", message, capacity);
         return TRUE;
     } catch (...) { return fail(L"目录检查出现异常，未执行安装或卸载。", message, capacity); }
-}
-
-extern "C" __declspec(dllexport) BOOL __stdcall LegacyOwner(
-    const wchar_t* launcher, wchar_t* owner, unsigned capacity) {
-    if (!launcher || !owner || capacity < 185) return FALSE;
-    try {
-        const auto sid = interactiveSid();
-        CascadeurProxy::Key user;
-        if (sid.empty() || RegOpenKeyExW(HKEY_USERS, sid.c_str(), 0, KEY_READ, &user.value) != ERROR_SUCCESS) return FALSE;
-        const auto root = std::filesystem::path(launcher).parent_path().parent_path().wstring();
-        std::wstring error;
-        // Reject an unrecoverable legacy install before replacing any files,
-        // even when the user deselects the new association task.
-        if (!ProductLegacy::restoreExtensions(user.value, root, error, true)) return FALSE;
-        wcscpy_s(owner, capacity, sid.c_str());
-        return TRUE;
-    }
-    catch (...) { return FALSE; }
-}
-extern "C" __declspec(dllexport) BOOL __stdcall RestoreLegacy(const wchar_t* sid, const wchar_t* launcher) {
-    if (!sid || !*sid) return TRUE;
-    if (!launcher || wcslen(sid) > 184) return FALSE;
-    try {
-        CascadeurProxy::Key user;
-        if (RegOpenKeyExW(HKEY_USERS, sid, 0, KEY_READ | KEY_WRITE, &user.value) != ERROR_SUCCESS) return FALSE;
-        const auto root = std::filesystem::path(launcher).parent_path().parent_path().wstring();
-        std::wstring error;
-        return ProductLegacy::restoreExtensions(user.value, root, error);
-    } catch (...) { return FALSE; }
-}
-
-namespace {
-bool openProxyUser(const wchar_t* sid, CascadeurProxy::Key& user, REGSAM access) {
-    if (!sid || !*sid || wcslen(sid) > 184) return false;
-    PSID parsed = nullptr;
-    if (!ConvertStringSidToSidW(sid, &parsed)) return false;
-    const bool valid = IsValidSid(parsed) != FALSE;
-    LocalFree(parsed);
-    return valid && RegOpenKeyExW(HKEY_USERS, sid, 0, access, &user.value) == ERROR_SUCCESS;
-}
-}
-
-extern "C" __declspec(dllexport) BOOL __stdcall PlanProxy(
-    const wchar_t* root, wchar_t* owner, unsigned ownerCapacity, wchar_t* message, unsigned capacity) {
-    if (!root || !owner || ownerCapacity < 185) return FALSE;
-    owner[0] = L'\0';
-    try {
-        const auto sid = interactiveSid();
-        CascadeurProxy::Key user;
-        if (!openProxyUser(sid.c_str(), user, KEY_READ))
-            return fail(L"无法确认当前桌面用户，未接管工程关联。", message, capacity);
-        std::vector<CascadeurProxy::Record> records;
-        std::wstring error;
-        // Explicit option: redirect the verified official handler to the
-        // selected installation, even when its old registration names another
-        // RizomUV directory. The original registration is never rewritten.
-        if (!CascadeurProxy::prepare(user.value, HKEY_LOCAL_MACHINE, root, records, error, true))
-            return fail(error.c_str(), message, capacity);
-        wcscpy_s(owner, ownerCapacity, sid.c_str());
-        return TRUE;
-    } catch (...) { return fail(L"工程关联预检查失败，未修改关联。", message, capacity); }
-}
-
-extern "C" __declspec(dllexport) BOOL __stdcall ApplyProxy(
-    const wchar_t* root, const wchar_t* owner, wchar_t* message, unsigned capacity) {
-    try {
-        CascadeurProxy::Key user;
-        if (!root || !openProxyUser(owner, user, KEY_READ | KEY_WRITE))
-            return fail(L"无法打开已确认用户的关联配置。", message, capacity);
-        std::wstring error;
-        if (!CascadeurProxy::install(user.value, HKEY_LOCAL_MACHINE, root, error, nullptr, true))
-            return fail(error.c_str(), message, capacity);
-        SHChangeNotify(SHCNE_ASSOCCHANGED, 0, nullptr, nullptr);
-        return TRUE;
-    } catch (...) { return fail(L"工程关联接管失败；请保留安装目录和日志后重试。", message, capacity); }
-}
-
-extern "C" __declspec(dllexport) BOOL __stdcall RemoveProxy(
-    const wchar_t* root, const wchar_t* owner, wchar_t* message, unsigned capacity) {
-    if (!owner || !*owner) return TRUE;
-    try {
-        CascadeurProxy::Key user;
-        if (!root || !openProxyUser(owner, user, KEY_READ | KEY_WRITE))
-            return fail(L"原安装用户的注册表未加载，请登录该用户后重试卸载。", message, capacity);
-        std::wstring error;
-        if (!CascadeurProxy::uninstall(user.value, root, error)) return fail(error.c_str(), message, capacity);
-        SHChangeNotify(SHCNE_ASSOCCHANGED, 0, nullptr, nullptr);
-        return TRUE;
-    } catch (...) { return fail(L"工程关联恢复失败，已停止卸载；请保留备份。", message, capacity); }
 }

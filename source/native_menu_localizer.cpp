@@ -7,13 +7,12 @@
 #include <atomic>
 #include <climits>
 #include <cstring>
-#include <vector>
 
 namespace rizomuv::localizer {
 namespace {
 
-size_t TranslateMenuTree(HMENU menu, const TranslationDictionary& dictionary) {
-    if (!menu) return 0;
+size_t TranslateMenuTree(HMENU menu, const TranslationDictionary& dictionary, unsigned depth = 0) {
+    if (!menu || depth > 32) return 0;
     size_t translatedCount = 0;
     const int count = GetMenuItemCount(menu);
     for (int position = 0; position < count; ++position) {
@@ -24,6 +23,9 @@ size_t TranslateMenuTree(HMENU menu, const TranslationDictionary& dictionary) {
         info.dwTypeData = buffer;
         info.cch = static_cast<UINT>(std::size(buffer) - 1);
         if (!GetMenuItemInfoW(menu, static_cast<UINT>(position), TRUE, &info)) continue;
+        if (info.hSubMenu) translatedCount += TranslateMenuTree(info.hSubMenu, dictionary, depth + 1);
+        if (info.fType & (MFT_OWNERDRAW | MFT_SEPARATOR)) continue;
+        if (info.cch >= std::size(buffer) - 1) continue;
         const std::wstring source(buffer, info.cch);
         const size_t shortcutOffset = source.find(L'\t');
         const std::wstring label = source.substr(0, shortcutOffset);
@@ -38,7 +40,6 @@ size_t TranslateMenuTree(HMENU menu, const TranslationDictionary& dictionary) {
             if (SetMenuItemInfoW(menu, static_cast<UINT>(position), TRUE, &replacement))
                 ++translatedCount;
         }
-        if (info.hSubMenu) translatedCount += TranslateMenuTree(info.hSubMenu, dictionary);
     }
     return translatedCount;
 }
@@ -63,6 +64,7 @@ constexpr int kCreditsFineTuneAt45 = 8;
 constexpr int kMenuBandHeightAt96Dpi = 27;
 
 std::atomic<bool> g_creditsStarted{false};
+std::atomic<bool> g_positionPending{false};
 HMODULE g_creditsModule = nullptr;
 HWND g_mainWindow = nullptr;
 HWND g_authorWindow = nullptr;
@@ -232,7 +234,11 @@ void PositionCreditWindows() {
         EnumWindows(FindMainRizomWindow, reinterpret_cast<LPARAM>(&candidate));
         g_mainWindow = candidate.window;
     }
-    if (!g_mainWindow) return;
+    if (!g_mainWindow) {
+        ShowWindow(g_authorWindow, SW_HIDE);
+        ShowWindow(g_gitHubWindow, SW_HIDE);
+        return;
+    }
     if (!IsWindowVisible(g_mainWindow) || IsIconic(g_mainWindow)) {
         ShowWindow(g_authorWindow, SW_HIDE);
         ShowWindow(g_gitHubWindow, SW_HIDE);
@@ -242,9 +248,8 @@ void PositionCreditWindows() {
     POINT origin{0, 0};
     if (!GetClientRect(g_mainWindow, &client) ||
         !ClientToScreen(g_mainWindow, &origin)) return;
-    if (g_menuBandHeight == 0)
-        g_menuBandHeight = MulDiv(kMenuBandHeightAt96Dpi,
-            static_cast<int>(GetDpiForWindow(g_mainWindow)), 96);
+    g_menuBandHeight = MulDiv(kMenuBandHeightAt96Dpi,
+        static_cast<int>(GetDpiForWindow(g_mainWindow)), 96);
     const int height = g_menuBandHeight;
     const int margin = MulDiv(8, height, 45);
     const int gap = MulDiv(14, height, 45);
@@ -274,7 +279,11 @@ void PositionCreditWindows() {
     if (g_gitHubWidth <= 0) g_gitHubWidth = MulDiv(100, height, 45);
     const int authorX = origin.x + g_menuLayoutWidth;
     const int gitHubX = authorX + g_authorWidth + gap;
-    if (gitHubX + g_gitHubWidth + margin > origin.x + client.right) return;
+    if (gitHubX + g_gitHubWidth + margin > origin.x + client.right) {
+        ShowWindow(g_authorWindow, SW_HIDE);
+        ShowWindow(g_gitHubWindow, SW_HIDE);
+        return;
+    }
     const int y = origin.y;
     if (authorX == g_authorX && gitHubX == g_gitHubX && y == g_authorY &&
         height == g_authorHeight && IsWindowVisible(g_authorWindow) &&
@@ -304,14 +313,15 @@ void CALLBACK CreditEventCallback(HWINEVENTHOOK, DWORD, HWND window,
     DWORD processId = 0;
     GetWindowThreadProcessId(window, &processId);
     if (processId == GetCurrentProcessId() && window != g_authorWindow &&
-        window != g_gitHubWindow && g_authorWindow)
-        PostMessageW(g_authorWindow, WM_APP + 1, 0, 0);
+        window != g_gitHubWindow && g_authorWindow && !g_positionPending.exchange(true))
+        if (!PostMessageW(g_authorWindow, WM_APP + 1, 0, 0)) g_positionPending.store(false);
 }
 
 LRESULT CALLBACK CreditWindowProcedure(HWND window, UINT message,
                                        WPARAM wParam, LPARAM lParam) {
     switch (message) {
     case WM_APP + 1:
+        g_positionPending.store(false);
         PositionCreditWindows();
         return 0;
     case WM_DISPLAYCHANGE:
@@ -329,6 +339,9 @@ LRESULT CALLBACK CreditWindowProcedure(HWND window, UINT message,
         ShellExecuteW(nullptr, L"open",
             window == g_authorWindow ? kAuthorUrl : kGitHubUrl,
             nullptr, nullptr, SW_SHOWNORMAL);
+        return 0;
+    case WM_DESTROY:
+        if (window == g_authorWindow) PostQuitMessage(0);
         return 0;
     case WM_ERASEBKGND:
         return 1;
@@ -349,7 +362,7 @@ DWORD WINAPI RunCreditWindows(void*) {
         g_mainWindow = candidate.window;
         if (!g_mainWindow) Sleep(100);
     }
-    if (!g_mainWindow) return 1;
+    if (!g_mainWindow) { g_creditsStarted.store(false); return 1; }
     WNDCLASSW windowClass{};
     windowClass.lpfnWndProc = CreditWindowProcedure;
     windowClass.hInstance = g_creditsModule;
@@ -363,7 +376,13 @@ DWORD WINAPI RunCreditWindows(void*) {
     g_gitHubWindow = CreateWindowExW(style, windowClass.lpszClassName,
         kGitHubText, WS_POPUP | WS_VISIBLE, 0, 0, 1, 1,
         g_mainWindow, nullptr, g_creditsModule, nullptr);
-    if (!g_authorWindow || !g_gitHubWindow) return 2;
+    if (!g_authorWindow || !g_gitHubWindow) {
+        if (g_authorWindow) DestroyWindow(g_authorWindow);
+        if (g_gitHubWindow) DestroyWindow(g_gitHubWindow);
+        g_authorWindow = g_gitHubWindow = nullptr;
+        g_creditsStarted.store(false);
+        return 2;
+    }
     g_locationHook = SetWinEventHook(EVENT_OBJECT_LOCATIONCHANGE,
         EVENT_OBJECT_LOCATIONCHANGE, nullptr, CreditEventCallback,
         GetCurrentProcessId(), 0, WINEVENT_OUTOFCONTEXT);
@@ -379,6 +398,8 @@ DWORD WINAPI RunCreditWindows(void*) {
         TranslateMessage(&message);
         DispatchMessageW(&message);
     }
+    for (auto hook : {g_locationHook, g_minimizeHook, g_visibilityHook})
+        if (hook) UnhookWinEvent(hook);
     return 0;
 }
 
@@ -392,8 +413,9 @@ size_t TranslateNativeMenus(DWORD processId, const TranslationDictionary& dictio
         GetWindowThreadProcessId(window, &pid);
         if (pid != context->pid) return TRUE;
         if (HMENU menu = GetMenu(window)) {
-            context->count += TranslateMenuTree(menu, *context->dictionary);
-            DrawMenuBar(window);
+            const size_t changed = TranslateMenuTree(menu, *context->dictionary);
+            context->count += changed;
+            if (changed) DrawMenuBar(window);
         }
         return TRUE;
     }, reinterpret_cast<LPARAM>(&context));

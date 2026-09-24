@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 project(RizomUVChinese LANGUAGES CXX)
+if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+  message(FATAL_ERROR "RizomUVChinese requires Windows x64")
+endif()
+# Do not require a newer VC runtime than an older RizomUV installation ships.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 # Match the other localizers: build/out contains deliverable binaries while
 # build/obj contains CMake/MSBuild projects, objects, caches and import libs.
@@ -56,3 +61,13 @@ add_custom_target(RizomUVOneClickPackage
   DEPENDS RizomUVChineseLauncher RizomUVChineseRuntime
   COMMENT "Packaging with source/inno/package.py (Inno Setup)"
   VERBATIM)
+
+add_executable(RizomUVCompatibilityTests EXCLUDE_FROM_ALL
+  source/tests/compatibility.cpp source/translation_dictionary.cpp source/runtime_log.cpp)
+target_include_directories(RizomUVCompatibilityTests PRIVATE "${LOCALIZER_INCLUDE_DIR}")
+target_compile_features(RizomUVCompatibilityTests PRIVATE cxx_std_17)
+target_compile_definitions(RizomUVCompatibilityTests PRIVATE UNICODE _UNICODE NOMINMAX WIN32_LEAN_AND_MEAN)
+target_link_libraries(RizomUVCompatibilityTests PRIVATE user32 gdi32 shell32)
+if(MSVC)
+  target_compile_options(RizomUVCompatibilityTests PRIVATE /W4 /WX /utf-8)
+endif()

@@ -6,6 +6,9 @@
 #include <winnt.h>
 
 #include <atomic>
+#include <mutex>
+#include <psapi.h>
+#include "rizomuv_localizer/iat_compatibility.h"
 
 namespace rizomuv::localizer {
 namespace {
@@ -24,7 +27,7 @@ ExtTextOutWFn g_extTextOutW = nullptr;
 GetTextExtentPoint32WFn g_getTextExtentPoint32W = nullptr;
 GetTextExtentExPointWFn g_getTextExtentExPointW = nullptr;
 const TranslationDictionary* g_dictionary = nullptr;
-thread_local std::wstring g_translatedText;
+thread_local std::wstring g_lookupText;
 std::atomic<unsigned long long> g_translationHits{0};
 
 bool ShouldLookupTranslation(LPCWSTR text, int length) {
@@ -51,33 +54,42 @@ bool ShouldLookupTranslation(LPCWSTR text, int length) {
 
 struct TextView { LPCWSTR text; int length; };
 
-TextView Translate(LPCWSTR text, int length) {
-    if (!g_dictionary || !text) return {text, length};
-    if (length < 0) length = static_cast<int>(wcsnlen_s(text, 65536));
-    if (length <= 0 || length > 65535) return {text, length};
-    if (!ShouldLookupTranslation(text, length)) return {text, length};
-    const std::wstring source(text, text + length);
-    const std::wstring* translated = g_dictionary->Find(source);
-    if (!translated) return {text, length};
-    g_translationHits.fetch_add(1, std::memory_order_relaxed);
-    g_translatedText = *translated;
-    return {g_translatedText.c_str(), static_cast<int>(g_translatedText.size())};
+TextView Translate(LPCWSTR text, int length) noexcept {
+    const TextView original{text, length};
+    if (!g_dictionary || !text) return original;
+    if (length == -1) length = static_cast<int>(wcsnlen_s(text, 65536));
+    if (length <= 0 || length > 65535) return original;
+    if (!ShouldLookupTranslation(text, length)) return original;
+    try {
+        g_lookupText.assign(text, static_cast<size_t>(length));
+        const std::wstring* translated = g_dictionary->Find(g_lookupText);
+        if (!translated) return original;
+        g_translationHits.fetch_add(1, std::memory_order_relaxed);
+        // Dictionary storage is immutable after initialization. No per-hit copy,
+        // and recursive painting cannot invalidate an outer call's translation.
+        return {translated->c_str(), static_cast<int>(translated->size())};
+    } catch (...) { return original; }
 }
 
 int WINAPI HookDrawTextW(HDC dc, LPCWSTR text, int count, LPRECT rect, UINT format) {
+    if (format & DT_MODIFYSTRING) return g_drawTextW(dc, text, count, rect, format);
     const TextView value = Translate(text, count);
     return g_drawTextW(dc, value.text, value.length, rect, format);
 }
 int WINAPI HookDrawTextExW(HDC dc, LPWSTR text, int count, LPRECT rect, UINT format, LPDRAWTEXTPARAMS params) {
+    if (format & DT_MODIFYSTRING) return g_drawTextExW(dc, text, count, rect, format, params);
     const TextView value = Translate(text, count);
     return g_drawTextExW(dc, const_cast<LPWSTR>(value.text), value.length, rect, format, params);
 }
 BOOL WINAPI HookTextOutW(HDC dc, int x, int y, LPCWSTR text, int count) {
+    if (count <= 0) return g_textOutW(dc, x, y, text, count);
     const TextView value = Translate(text, count);
     return g_textOutW(dc, x, y, value.text, value.length);
 }
 BOOL WINAPI HookExtTextOutW(HDC dc, int x, int y, UINT options, const RECT* rect,
                             LPCWSTR text, UINT count, const INT* spacing) {
+    if ((options & ETO_GLYPH_INDEX) || count > 65535)
+        return g_extTextOutW(dc, x, y, options, rect, text, count, spacing);
     const TextView value = Translate(text, static_cast<int>(count));
     // Character spacing is only valid for the original glyph sequence.
     const INT* translatedSpacing = value.text == text ? spacing : nullptr;
@@ -85,69 +97,74 @@ BOOL WINAPI HookExtTextOutW(HDC dc, int x, int y, UINT options, const RECT* rect
                          static_cast<UINT>(value.length), translatedSpacing);
 }
 BOOL WINAPI HookGetTextExtentPoint32W(HDC dc, LPCWSTR text, int count, LPSIZE size) {
+    if (count <= 0) return g_getTextExtentPoint32W(dc, text, count, size);
     const TextView value = Translate(text, count);
     return g_getTextExtentPoint32W(dc, value.text, value.length, size);
 }
 BOOL WINAPI HookGetTextExtentExPointW(HDC dc, LPCWSTR text, int count, int maxExtent,
                                       LPINT fit, LPINT dx, LPSIZE size) {
+    // Per-character arrays and fit indices belong to the original string.
+    // Substituting a longer translation here can overrun the caller buffer.
+    if (fit || dx || count <= 0) return g_getTextExtentExPointW(dc, text, count, maxExtent, fit, dx, size);
     const TextView value = Translate(text, count);
     return g_getTextExtentExPointW(dc, value.text, value.length, maxExtent, fit, dx, size);
 }
 
-bool PatchSlot(void** slot, void* replacement, void** original) {
+bool PatchSlot(void** slot, void* replacement, void* expected) {
+    if (!expected || *slot != expected) return false;
     DWORD oldProtection = 0;
     if (!VirtualProtect(slot, sizeof(void*), PAGE_READWRITE, &oldProtection)) return false;
-    if (!*original) *original = *slot;
-    *slot = replacement;
+    const bool changed = InterlockedCompareExchangePointer(slot, replacement, expected) == expected;
     DWORD ignored = 0;
     VirtualProtect(slot, sizeof(void*), oldProtection, &ignored);
-    FlushInstructionCache(GetCurrentProcess(), slot, sizeof(void*));
-    return true;
+    return changed;
 }
 
 } // namespace
 
 bool InstallGdiIatHooks(HMODULE targetModule, const TranslationDictionary* dictionary,
                         std::wstring& error) {
-    g_dictionary = dictionary;
-    auto* base = reinterpret_cast<unsigned char*>(targetModule);
-    auto* dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
-    if (!dos || dos->e_magic != IMAGE_DOS_SIGNATURE) { error = L"目标模块不是有效 PE"; return false; }
-    auto* nt = reinterpret_cast<IMAGE_NT_HEADERS*>(base + dos->e_lfanew);
-    if (nt->Signature != IMAGE_NT_SIGNATURE) { error = L"目标模块 PE 头无效"; return false; }
-    const auto& directory = nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
-    if (!directory.VirtualAddress) { error = L"目标模块没有导入表"; return false; }
-
-    size_t installed = 0;
-    auto* descriptor = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(base + directory.VirtualAddress);
-    for (; descriptor->Name; ++descriptor) {
-        const char* dll = reinterpret_cast<const char*>(base + descriptor->Name);
-        if (_stricmp(dll, "user32.dll") != 0 && _stricmp(dll, "gdi32.dll") != 0) continue;
-        auto* names = descriptor->OriginalFirstThunk
-            ? reinterpret_cast<IMAGE_THUNK_DATA*>(base + descriptor->OriginalFirstThunk)
-            : reinterpret_cast<IMAGE_THUNK_DATA*>(base + descriptor->FirstThunk);
-        auto* slots = reinterpret_cast<IMAGE_THUNK_DATA*>(base + descriptor->FirstThunk);
-        for (; names->u1.AddressOfData; ++names, ++slots) {
-            if (IMAGE_SNAP_BY_ORDINAL(names->u1.Ordinal)) continue;
-            const auto* import = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(base + names->u1.AddressOfData);
-            const char* name = reinterpret_cast<const char*>(import->Name);
-            void** slot = reinterpret_cast<void**>(&slots->u1.Function);
-            bool patched = false;
-            if (strcmp(name, "DrawTextW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookDrawTextW), reinterpret_cast<void**>(&g_drawTextW));
-            else if (strcmp(name, "DrawTextExW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookDrawTextExW), reinterpret_cast<void**>(&g_drawTextExW));
-            else if (strcmp(name, "TextOutW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookTextOutW), reinterpret_cast<void**>(&g_textOutW));
-            else if (strcmp(name, "ExtTextOutW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookExtTextOutW), reinterpret_cast<void**>(&g_extTextOutW));
-            else if (strcmp(name, "GetTextExtentPoint32W") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookGetTextExtentPoint32W), reinterpret_cast<void**>(&g_getTextExtentPoint32W));
-            else if (strcmp(name, "GetTextExtentExPointW") == 0) patched = PatchSlot(slot, reinterpret_cast<void*>(HookGetTextExtentExPointW), reinterpret_cast<void**>(&g_getTextExtentExPointW));
-            if (patched) ++installed;
-        }
+    static std::once_flag initialized;
+    std::call_once(initialized, [dictionary] {
+        g_dictionary = dictionary;
+        const HMODULE user = GetModuleHandleW(L"user32.dll");
+        const HMODULE gdi = GetModuleHandleW(L"gdi32.dll");
+        g_drawTextW = reinterpret_cast<DrawTextWFn>(GetProcAddress(user, "DrawTextW"));
+        g_drawTextExW = reinterpret_cast<DrawTextExWFn>(GetProcAddress(user, "DrawTextExW"));
+        g_textOutW = reinterpret_cast<TextOutWFn>(GetProcAddress(gdi, "TextOutW"));
+        g_extTextOutW = reinterpret_cast<ExtTextOutWFn>(GetProcAddress(gdi, "ExtTextOutW"));
+        g_getTextExtentPoint32W = reinterpret_cast<GetTextExtentPoint32WFn>(GetProcAddress(gdi, "GetTextExtentPoint32W"));
+        g_getTextExtentExPointW = reinterpret_cast<GetTextExtentExPointWFn>(GetProcAddress(gdi, "GetTextExtentExPointW"));
+    });
+    struct Api { void* original; void* hook; };
+    const Api apis[] = {
+        {reinterpret_cast<void*>(g_drawTextW), reinterpret_cast<void*>(HookDrawTextW)},
+        {reinterpret_cast<void*>(g_drawTextExW), reinterpret_cast<void*>(HookDrawTextExW)},
+        {reinterpret_cast<void*>(g_textOutW), reinterpret_cast<void*>(HookTextOutW)},
+        {reinterpret_cast<void*>(g_extTextOutW), reinterpret_cast<void*>(HookExtTextOutW)},
+        {reinterpret_cast<void*>(g_getTextExtentPoint32W), reinterpret_cast<void*>(HookGetTextExtentPoint32W)},
+        {reinterpret_cast<void*>(g_getTextExtentExPointW), reinterpret_cast<void*>(HookGetTextExtentExPointW)}
+    };
+    MODULEINFO info{};
+    if (!GetModuleInformation(GetCurrentProcess(), targetModule, &info, sizeof(info))) {
+        error = L"无法读取模块范围"; return false;
     }
-    if (!g_getTextExtentPoint32W || !g_extTextOutW) {
-        error = L"缺少已验证的 GDI 测量或绘制入口";
-        return false;
+    size_t active = 0;
+    const size_t installed = VisitImportSlots(static_cast<unsigned char*>(info.lpBaseOfDll), info.SizeOfImage,
+        [&](void** slot) {
+            for (const auto& api : apis) {
+                if (*slot == api.hook) { ++active; return false; }
+                if (PatchSlot(slot, api.hook, api.original)) { ++active; return true; }
+            }
+            return false;
+        });
+    if (installed) {
+        wchar_t path[32768]{};
+        GetModuleFileNameW(targetModule, path, 32768);
+        RuntimeLog(L"GDI 兼容检测：" + std::wstring(path) + L"，新增入口=" + std::to_wstring(installed));
     }
-    RuntimeLog(L"已安装 GDI IAT Hook：" + std::to_wstring(installed) + L" 个入口");
-    return true;
+    if (!active) error = L"未发现可用 GDI 导入，保留原始绘制";
+    return active != 0;
 }
 
 unsigned long long GetGdiTranslationHitCount() {
