@@ -69,26 +69,39 @@ TextView Translate(LPCWSTR text, int length) noexcept {
     return {translated->c_str(), static_cast<int>(translated->size())};
 }
 
+// Memory DCs are used by the host's UI cache and must keep localization.
+// Explicit printer/metafile output is document data, so preserve its text.
+bool IsDisplayContext(HDC dc) noexcept {
+    if (!dc) return false;
+    const DWORD kind = GetObjectType(dc);
+    if (kind != OBJ_DC && kind != OBJ_MEMDC) return false;
+    return GetDeviceCaps(dc, TECHNOLOGY) == DT_RASDISPLAY;
+}
+
+TextView TranslateForDisplay(HDC dc, LPCWSTR text, int count) noexcept {
+    return IsDisplayContext(dc) ? Translate(text, count) : TextView{text, count};
+}
+
 int WINAPI HookDrawTextW(HDC dc, LPCWSTR text, int count, LPRECT rect, UINT format) {
     if (format & DT_MODIFYSTRING) return g_drawTextW(dc, text, count, rect, format);
-    const TextView value = Translate(text, count);
+    const TextView value = TranslateForDisplay(dc, text, count);
     return g_drawTextW(dc, value.text, value.length, rect, format);
 }
 int WINAPI HookDrawTextExW(HDC dc, LPWSTR text, int count, LPRECT rect, UINT format, LPDRAWTEXTPARAMS params) {
     if (format & DT_MODIFYSTRING) return g_drawTextExW(dc, text, count, rect, format, params);
-    const TextView value = Translate(text, count);
+    const TextView value = TranslateForDisplay(dc, text, count);
     return g_drawTextExW(dc, const_cast<LPWSTR>(value.text), value.length, rect, format, params);
 }
 BOOL WINAPI HookTextOutW(HDC dc, int x, int y, LPCWSTR text, int count) {
     if (count <= 0) return g_textOutW(dc, x, y, text, count);
-    const TextView value = Translate(text, count);
+    const TextView value = TranslateForDisplay(dc, text, count);
     return g_textOutW(dc, x, y, value.text, value.length);
 }
 BOOL WINAPI HookExtTextOutW(HDC dc, int x, int y, UINT options, const RECT* rect,
                             LPCWSTR text, UINT count, const INT* spacing) {
     if ((options & ETO_GLYPH_INDEX) || count > 65535)
         return g_extTextOutW(dc, x, y, options, rect, text, count, spacing);
-    const TextView value = Translate(text, static_cast<int>(count));
+    const TextView value = TranslateForDisplay(dc, text, static_cast<int>(count));
     // Character spacing is only valid for the original glyph sequence.
     const INT* translatedSpacing = value.text == text ? spacing : nullptr;
     return g_extTextOutW(dc, x, y, options, rect, value.text,
@@ -96,7 +109,7 @@ BOOL WINAPI HookExtTextOutW(HDC dc, int x, int y, UINT options, const RECT* rect
 }
 BOOL WINAPI HookGetTextExtentPoint32W(HDC dc, LPCWSTR text, int count, LPSIZE size) {
     if (count <= 0) return g_getTextExtentPoint32W(dc, text, count, size);
-    const TextView value = Translate(text, count);
+    const TextView value = TranslateForDisplay(dc, text, count);
     return g_getTextExtentPoint32W(dc, value.text, value.length, size);
 }
 BOOL WINAPI HookGetTextExtentExPointW(HDC dc, LPCWSTR text, int count, int maxExtent,
@@ -104,7 +117,7 @@ BOOL WINAPI HookGetTextExtentExPointW(HDC dc, LPCWSTR text, int count, int maxEx
     // Per-character arrays and fit indices belong to the original string.
     // Substituting a longer translation here can overrun the caller buffer.
     if (fit || dx || count <= 0) return g_getTextExtentExPointW(dc, text, count, maxExtent, fit, dx, size);
-    const TextView value = Translate(text, count);
+    const TextView value = TranslateForDisplay(dc, text, count);
     return g_getTextExtentExPointW(dc, value.text, value.length, maxExtent, fit, dx, size);
 }
 

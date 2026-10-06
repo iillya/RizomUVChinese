@@ -49,7 +49,7 @@ constexpr wchar_t kLauncher[] = L"RizomUVChineseLauncher.exe";
 
 bool safePath(const std::wstring& root) {
     // A host directory, not a drive root, UNC share or Win32 device path.
-    if (root.size() < 4 || root.size() > 180 || root[1] != L':' || root[2] != L'\\' ||
+    if (root.size() < 4 || root[1] != L':' || root[2] != L'\\' ||
         !((root[0] >= L'A' && root[0] <= L'Z') || (root[0] >= L'a' && root[0] <= L'z')) ||
         root.find_first_of(L"\"<>|?*") != std::wstring::npos || root.find(L':', 2) != std::wstring::npos) return false;
     wchar_t full[32768]{};
@@ -113,7 +113,7 @@ extern "C" __declspec(dllexport) BOOL __stdcall CheckTarget(
     if (message && capacity) message[0] = L'\0';
     try {
         const std::wstring root(directory ? directory : L"");
-        if (!safePath(root)) return fail(L"请选择本地、无目录链接的 RizomUV 目录；路径长度上限为 180 字符。", message, capacity);
+        if (!safePath(root)) return fail(L"请选择本地磁盘上真实存在、无目录链接的 RizomUV 目录。", message, capacity);
         unsigned count = 0;
         if (!safeTree(std::filesystem::path(root) / L"ChineseLauncher", 0, count))
             return fail(L"ChineseLauncher 内含目录链接、不可访问文件或超出检查上限，已停止操作。", message, capacity);

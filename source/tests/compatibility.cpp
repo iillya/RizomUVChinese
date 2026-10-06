@@ -57,6 +57,8 @@ void TestDictionaryAndArguments() {
         R"({"translations":{"A":"甲"},"meta":[true,]})",
         R"({"translations":{"A":"甲"},"meta":01})",
         R"({"translations":{"A":"甲"},"meta":falsehood})",
+        R"({"translations":{"A":"\u0000bad"}})",
+        R"({"translations":{"A\u0000B":"甲"}})",
         R"({"translations":{"A":"\ud800"}})",
         R"({"translations":{"A":"\udc00"}})",
         R"({"translations":{"A":"甲"}} trailing)",
@@ -82,6 +84,27 @@ void TestDictionaryAndArguments() {
     Translate(L"not present", 11);
     assert(std::wstring(first.text, first.length) == L"更长的中文测试");
     assert(Translate(L"C:\\ABC", 6).text != first.text);
+    HDC memoryDc = CreateCompatibleDC(nullptr);
+    assert(memoryDc && IsDisplayContext(memoryDc));
+    const auto displayed = TranslateForDisplay(memoryDc, L"ABC", 3);
+    assert(displayed.length == 7 && std::wstring(displayed.text, displayed.length) == L"更长的中文测试");
+    // The same cached UI DC must still measure the displayed Chinese string.
+    g_getTextExtentPoint32W = GetTextExtentPoint32W;
+    SIZE expectedWidth{}, actualWidth{};
+    assert(GetTextExtentPoint32W(memoryDc, first.text, first.length, &expectedWidth));
+    assert(HookGetTextExtentPoint32W(memoryDc, L"ABC", 3, &actualWidth));
+    assert(expectedWidth.cx == actualWidth.cx && expectedWidth.cy == actualWidth.cy);
+    g_drawTextW = DrawTextW;
+    RECT expectedBounds{0, 0, 200, 100}, actualBounds = expectedBounds;
+    assert(DrawTextW(memoryDc, first.text, first.length, &expectedBounds, DT_CALCRECT | DT_SINGLELINE));
+    assert(HookDrawTextW(memoryDc, L"ABC", 3, &actualBounds, DT_CALCRECT | DT_SINGLELINE));
+    assert(EqualRect(&expectedBounds, &actualBounds));
+    HDC metafileDc = CreateEnhMetaFileW(nullptr, nullptr, nullptr, L"Rizom test\0export\0");
+    assert(metafileDc && !IsDisplayContext(metafileDc));
+    const auto exported = TranslateForDisplay(metafileDc, L"ABC", 3);
+    assert(std::wstring(exported.text, exported.length) == L"ABC");
+    DeleteEnhMetaFile(CloseEnhMetaFile(metafileDc));
+    DeleteDC(memoryDc);
     const auto start = std::chrono::steady_clock::now();
     for (int i = 0; i < 100000; ++i) { Translate(L"ABC", 3); Translate(L"Unknown UI label", 16); }
     const auto micros = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();

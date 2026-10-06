@@ -32,7 +32,7 @@ build\out\RizomUVCompatibilityTests.exe translations/dictionary_zh.json
 python source/inno/package.py --test-mode
 ```
 
-测试安装器位于 `build/inno/test-package`，使用独立的产品 ID 与用户级卸载记录，不创建桌面或开始菜单快捷方式。它仍会写入指定目录，必须使用 `build` 下独立的测试宿主目录。测试卸载会完整删除该目录中的 `ChineseLauncher`。
+测试安装器位于 `build/inno/test-package`，使用独立的产品 ID 与用户级卸载记录，不创建桌面或开始菜单快捷方式。它仍会写入指定目录，必须使用 `build` 下独立的测试宿主目录。测试卸载仅删除归属补丁的文件，人工修改的词典和额外文件应保留。
 
 ## 兼容性原则
 

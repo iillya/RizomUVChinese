@@ -48,6 +48,8 @@ def validate_dictionary(source):
     for key, value in translations.items():
         if not isinstance(value, str):
             raise ValueError(f'Non-string translation: {key!r}')
+        if '\0' in key or '\0' in value:
+            raise ValueError('Dictionary strings cannot contain embedded NUL')
         key.encode('utf-8')
         value.encode('utf-8')  # Reject unpaired Unicode surrogates.
     if not any(key and value for key, value in translations.items()):
@@ -73,20 +75,29 @@ def payload_entries():
 
 
 def includes(entries):
-    files, code = [], [f'SetArrayLength(PayloadNames, {len(entries)});']
+    files, code = [], [f'SetArrayLength(PayloadNames, {len(entries)});',
+                       f'SetArrayLength(PayloadHashes, {len(entries)});']
     for index, (name, source, digest) in enumerate(entries):
         parent, filename = name.rsplit('\\', 1) if '\\' in name else ('', name)
         target = '{app}\\ChineseLauncher' + ('\\' + parent if parent else '')
+        flags, check = 'ignoreversion', ''
+        if name.casefold().startswith('translations\\') or name.casefold() in ('dictionary_zh.json', 'settings.ini'):
+            flags += ' uninsneveruninstall'
+            check = f'; Check: ShouldInstallDictionary({pascal_string(name)}, {pascal_string(digest)})'
+            defaults = '{app}\\ChineseLauncher\\.inno\\defaults' + ('\\' + parent if parent else '')
+            files.append(f'Source: "{iss_string(source)}"; DestDir: "{defaults}"; '
+                         f'DestName: "{iss_string(filename)}"; Flags: ignoreversion')
         files.append(f'Source: "{iss_string(source)}"; DestDir: "{target}"; '
-                     f'DestName: "{iss_string(filename)}"; Flags: ignoreversion')
+                     f'DestName: "{iss_string(filename)}"; Flags: {flags}{check}')
         code.append(f'PayloadNames[{index}] := {pascal_string(name)};')
+        code.append(f'PayloadHashes[{index}] := {pascal_string(digest)};')
     return '\n'.join(files) + '\n', '\n'.join(code) + '\n'
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--iscc', type=Path, default=os.environ.get('INNO_ISCC', ROOT.parent / '_ThirdParty/InnoSetup/7.1.0/ISCC.exe'))
-    parser.add_argument('--version', default='1.0.4')
+    parser.add_argument('--version', default='1.0.5')
     parser.add_argument('--test-mode', action='store_true')
     args = parser.parse_args()
     if not re.fullmatch(r'\d+\.\d+\.\d+(?:\.\d+)?', args.version): parser.error('Invalid version')

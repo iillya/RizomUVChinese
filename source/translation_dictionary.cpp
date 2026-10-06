@@ -122,7 +122,8 @@ private:
             SkipWhitespace();
             if (!Consume(L':')) return false;
             SkipWhitespace();
-            if (!ReadString(translated)) return false;
+            if (!ReadString(translated) || source.find(L'\0') != std::wstring::npos ||
+                translated.find(L'\0') != std::wstring::npos) return false;
             if (!source.empty() && !translated.empty()) output.emplace(std::move(source), std::move(translated));
             SkipWhitespace();
             if (Consume(L'}')) return true;
