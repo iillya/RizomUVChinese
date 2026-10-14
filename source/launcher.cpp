@@ -2,6 +2,7 @@
 #include <shellapi.h>
 #include <tlhelp32.h>
 #include "rizomuv_localizer/command_line.h"
+#include "rizomuv_localizer/remote_module.h"
 
 #include <filesystem>
 #include <string>
@@ -59,8 +60,7 @@ LPTHREAD_START_ROUTINE ResolveRemoteLoadLibrary(DWORD processId) {
                   : reinterpret_cast<LPTHREAD_START_ROUTINE>(localFunction);
 }
 
-std::filesystem::path FindInstalledRizomUV() {
-    const std::filesystem::path launcherDirectory = LauncherDirectory();
+std::filesystem::path FindInstalledRizomUV(const std::filesystem::path& launcherDirectory) {
     const std::filesystem::path besideLauncher = launcherDirectory / L"rizomuv.exe";
     if (std::filesystem::is_regular_file(besideLauncher)) return besideLauncher;
 
@@ -88,8 +88,7 @@ bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtime
             if (thread) {
                 if (WaitForSingleObject(thread, 10000) == WAIT_OBJECT_0) {
                     remoteThreadCompleted = true;
-                    DWORD result = 0;
-                    success = GetExitCodeThread(thread, &result) && result != 0;
+                    success = rizomuv::localizer::HasLoadedModule(process, path);
                 }
                 CloseHandle(thread);
             }
@@ -106,12 +105,17 @@ bool LoadRuntimeIntoProcess(HANDLE process, const std::filesystem::path& runtime
 } // namespace
 
 int RunLauncher(int argc, wchar_t** argv) {
+    const auto launcherDirectory = LauncherDirectory();
+    if (launcherDirectory.empty()) {
+        ShowError(L"无法确定中文启动器所在目录。");
+        return 3;
+    }
     const bool explicitHost = argc > 1 &&
         _wcsicmp(std::filesystem::path(argv[1]).filename().c_str(), L"rizomuv.exe") == 0;
     const auto rizomuvExecutable = std::filesystem::absolute(explicitHost
-        ? std::filesystem::path(argv[1]) : FindInstalledRizomUV());
-    const std::filesystem::path runtimePath = LauncherDirectory() / L"RizomUVChineseRuntime.dll";
-    const std::filesystem::path dictionaryPath = LauncherDirectory() / L"dictionary_zh.json";
+        ? std::filesystem::path(argv[1]) : FindInstalledRizomUV(launcherDirectory));
+    const std::filesystem::path runtimePath = launcherDirectory / L"RizomUVChineseRuntime.dll";
+    const std::filesystem::path dictionaryPath = launcherDirectory / L"dictionary_zh.json";
 
     if (!std::filesystem::is_regular_file(rizomuvExecutable)) {
         ShowError(L"找不到 RizomUV：" + rizomuvExecutable.wstring());

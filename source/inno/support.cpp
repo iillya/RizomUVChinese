@@ -1,7 +1,11 @@
 // Validate the host and bound installation/uninstallation to its plugin directory.
 // No Qt dependency, process injection, process termination or shell execution.
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #include <tlhelp32.h>
 #include <filesystem>

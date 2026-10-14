@@ -2,6 +2,15 @@
 #ifndef PayloadInclude
   #error Build using source\build_inno.bat
 #endif
+
+#ifdef TestReleasedDefaultHash
+  #ifndef TestMode
+    #error TestReleasedDefaultHash is restricted to isolated TestMode builds
+  #endif
+  #define ReleasedDefaultHash TestReleasedDefaultHash
+#else
+  #define ReleasedDefaultHash "f451aeeba323722589b5b5131521f69c63e3c6524d611ca1fba99313f2800a44"
+#endif
 #define ProductId "RizomUVChinese.Inno"
 #define ProductName "RizomUV 中文补丁"
 #ifdef TestMode
@@ -118,7 +127,7 @@ begin
   { 1.0.4 deleted the hash journal. Its published dictionary is still a known
     unmodified default, so it may be updated without touching custom files. }
   Result := (CompareText(Name, 'dictionary_zh.json') = 0) and
-    (CompareText(Digest, 'f451aeeba323722589b5b5131521f69c63e3c6524d611ca1fba99313f2800a44') = 0);
+    (CompareText(Digest, '{#ReleasedDefaultHash}') = 0);
 end;
 
 function ShouldInstallDictionary(Name, NewHash: String): Boolean;
@@ -230,6 +239,22 @@ end;
 
 #include "cleanup.iss"
 
+#ifndef TestMode
+procedure RemoveExperimentalRegistration;
+var
+  PreviousDir: String;
+begin
+  { A stale record from another directory must remain independently managed. }
+  if RegQueryStringValue(HKLM64,
+    'Software\Microsoft\Windows\CurrentVersion\Uninstall\RizomUVChinese.Inno.Experimental_is1',
+    'InstallLocation', PreviousDir) and
+    (CompareText(RemoveBackslashUnlessRoot(PreviousDir),
+                 RemoveBackslashUnlessRoot(ExpandConstant('{app}'))) = 0) then
+    RegDeleteKeyIncludingSubkeys(HKLM64,
+      'Software\Microsoft\Windows\CurrentVersion\Uninstall\RizomUVChinese.Inno.Experimental_is1');
+end;
+#endif
+
 procedure CurStepChanged(CurStep: TSetupStep);
 var
   I: Integer;
@@ -259,11 +284,7 @@ begin
       #ifndef TestMode
       { Remove alternate uninstall records from other installer IDs for the
         same product so they cannot later delete this shared ChineseLauncher. }
-      if CompareText('{#ProductId}', 'RizomUVChinese.Inno') <> 0 then
-        RegDeleteKeyIncludingSubkeys(HKLM64,
-          'Software\Microsoft\Windows\CurrentVersion\Uninstall\RizomUVChinese.Inno_is1');
-      RegDeleteKeyIncludingSubkeys(HKLM64,
-        'Software\Microsoft\Windows\CurrentVersion\Uninstall\RizomUVChinese.Inno.Experimental_is1');
+      RemoveExperimentalRegistration;
       #endif
     CleanupInstallerBackups;
   end;

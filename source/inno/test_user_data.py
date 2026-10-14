@@ -39,6 +39,7 @@ def compile_variant(output, dictionary):
     code_path.write_text(code, encoding='utf-8-sig')
     run([ISCC, f'/DPayloadInclude={files_path}', f'/DPayloadCode={code_path}',
          f'/DSupportDll={BUILD / "support.dll"}', f'/DPackageOutput={output}',
+         f'/DTestReleasedDefaultHash={hashlib.sha256((ROOT / "translations/dictionary_zh.json").read_bytes()).hexdigest()}',
          '/DPackageVersion=1.0.5', '/DTestMode=1', package.HERE / 'RizomUVChinese.iss'],
         cwd=package.HERE)
     return output / 'RizomUVChineseInstaller.exe'

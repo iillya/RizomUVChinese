@@ -10,6 +10,7 @@
 #include <shellapi.h>
 #include <chrono>
 #include "rizomuv_localizer/command_line.h"
+#include "rizomuv_localizer/remote_module.h"
 
 namespace {
 BOOL WINAPI Extent(HDC, LPCWSTR, int count, int, LPINT fit, LPINT dx, LPSIZE size) {
@@ -86,6 +87,11 @@ void TestDictionaryAndArguments() {
     assert(Translate(L"C:\\ABC", 6).text != first.text);
     HDC memoryDc = CreateCompatibleDC(nullptr);
     assert(memoryDc && IsDisplayContext(memoryDc));
+    SetLastError(12345);
+    assert(IsDisplayContext(memoryDc) && GetLastError() == 12345);
+    const auto beforeMiss = g_translationHits.load();
+    assert(TranslateForDisplay(nullptr, L"Unknown", 7).text != first.text);
+    assert(g_translationHits.load() == beforeMiss);
     const auto displayed = TranslateForDisplay(memoryDc, L"ABC", 3);
     assert(displayed.length == 7 && std::wstring(displayed.text, displayed.length) == L"更长的中文测试");
     // The same cached UI DC must still measure the displayed Chinese string.
@@ -101,8 +107,10 @@ void TestDictionaryAndArguments() {
     assert(EqualRect(&expectedBounds, &actualBounds));
     HDC metafileDc = CreateEnhMetaFileW(nullptr, nullptr, nullptr, L"Rizom test\0export\0");
     assert(metafileDc && !IsDisplayContext(metafileDc));
+    const auto beforeExport = g_translationHits.load();
     const auto exported = TranslateForDisplay(metafileDc, L"ABC", 3);
     assert(std::wstring(exported.text, exported.length) == L"ABC");
+    assert(g_translationHits.load() == beforeExport);
     DeleteEnhMetaFile(CloseEnhMetaFile(metafileDc));
     DeleteDC(memoryDc);
     const auto start = std::chrono::steady_clock::now();
@@ -176,9 +184,55 @@ void TestCreditEventFiltering() {
     g_positionPending.store(false);
 }
 
+void TestCreditInitialization() {
+    using namespace rizomuv::localizer;
+    assert(IsMainFrameStyle(WS_OVERLAPPEDWINDOW, 0));
+    assert(IsMainFrameStyle(WS_POPUP | WS_OVERLAPPEDWINDOW, 0));
+    assert(!IsMainFrameStyle(WS_POPUP | WS_BORDER, 0)); // Large splash screen.
+    assert(!IsMainFrameStyle(WS_CAPTION | WS_SYSMENU, 0)); // Startup dialog.
+    assert(!IsMainFrameStyle(WS_OVERLAPPEDWINDOW, WS_EX_TOOLWINDOW));
+    assert(!IsMainFrameStyle(WS_OVERLAPPEDWINDOW | WS_CHILD, 0));
+    const RECT monitor{1920, 0, 3840, 1080};
+    const RECT splash{2200, 200, 3000, 700};
+    assert(IsFullScreenMainFrame(WS_POPUP, 0, monitor, monitor, L"RizomUV Real Space"));
+    assert(!IsFullScreenMainFrame(WS_POPUP, 0, splash, monitor, L"RizomUV"));
+    assert(!IsFullScreenMainFrame(WS_POPUP, WS_EX_TOOLWINDOW, monitor, monitor, L"RizomUV"));
+    assert(!IsFullScreenMainFrame(WS_POPUP, 0, monitor, monitor, L"Startup"));
+    // Real GDI/layered-window regression, confined to our own hidden windows.
+    // Rendering a surface must not show or activate it before initialization.
+    const HINSTANCE module = GetModuleHandleW(nullptr);
+    WNDCLASSW windowClass{};
+    windowClass.lpfnWndProc = DefWindowProcW;
+    windowClass.hInstance = module;
+    windowClass.lpszClassName = L"RizomUVCreditSurfaceTest";
+    assert(RegisterClassW(&windowClass));
+    const HWND link = CreateWindowExW(WS_EX_LAYERED | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW,
+        windowClass.lpszClassName, L"", WS_POPUP, 0, 0, 1, 1,
+        nullptr, nullptr, module, nullptr);
+    assert(link && !IsWindowVisible(link));
+    for (int height : {27, 34, 41, 54}) {
+        assert(RenderLinkWindow(link, kAuthorText, -10000, -10000, 300, height));
+        assert(!IsWindowVisible(link));
+        RECT bounds{};
+        assert(GetWindowRect(link, &bounds));
+        assert(bounds.right - bounds.left == 300 && bounds.bottom - bounds.top == height);
+        assert(RenderLinkWindow(link, kGitHubText, -10000, -10000, 180, height));
+        assert(!IsWindowVisible(link));
+    }
+    assert(!RenderLinkWindow(nullptr, kAuthorText, 0, 0, 0, 27));
+    DestroyWindow(link);
+    assert(UnregisterClassW(windowClass.lpszClassName, module));
+    std::cout << "PASS: credits frame selection and hidden layered surfaces at four DPI sizes\n";
+}
+
 int main(int argc, char** argv) {
     TestDictionaryAndArguments();
     TestCreditEventFiltering();
+    TestCreditInitialization();
+    wchar_t modulePath[32768]{};
+    assert(GetModuleFileNameW(GetModuleHandleW(L"kernel32.dll"), modulePath, 32768));
+    assert(rizomuv::localizer::HasLoadedModule(GetCurrentProcess(), modulePath));
+    assert(!rizomuv::localizer::HasLoadedModule(GetCurrentProcess(), L"C:\\not-loaded\\runtime.dll"));
     using namespace rizomuv::localizer;
     if (argc > 1) {
         TranslationDictionary official;

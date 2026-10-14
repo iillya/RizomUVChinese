@@ -1,12 +1,12 @@
 #include "rizomuv_localizer/native_menu_localizer.h"
 
 #include "rizomuv_localizer/translation_dictionary.h"
+#include "rizomuv_localizer/runtime_log.h"
 
 #include <shellapi.h>
 
 #include <atomic>
 #include <climits>
-#include <cstring>
 
 namespace rizomuv::localizer {
 namespace {
@@ -19,7 +19,7 @@ size_t TranslateMenuTree(HMENU menu, const TranslationDictionary& dictionary, un
         MENUITEMINFOW info{};
         info.cbSize = sizeof(info);
         info.fMask = MIIM_STRING | MIIM_SUBMENU | MIIM_FTYPE;
-        wchar_t buffer[4096]{};
+        wchar_t buffer[4096]; // GetMenuItemInfo supplies the returned characters.
         info.dwTypeData = buffer;
         info.cch = static_cast<UINT>(std::size(buffer) - 1);
         if (!GetMenuItemInfoW(menu, static_cast<UINT>(position), TRUE, &info)) continue;
@@ -81,8 +81,29 @@ int g_gitHubWidth = 0;
 int g_menuBandHeight = 0;
 int g_authorHeight = 0;
 int g_menuLayoutWidth = 0;
+constexpr UINT_PTR kCreditsStartupRetry = 1;
+ULONGLONG g_creditsRetryDeadline = 0;
+DWORD g_authorUpdateError = ERROR_SUCCESS;
+DWORD g_gitHubUpdateError = ERROR_SUCCESS;
 
 struct MainWindowCandidate { HWND window = nullptr; LONG64 area = 0; };
+
+bool IsMainFrameStyle(LONG_PTR style, LONG_PTR extendedStyle) {
+    // Splash screens and floating panels can be the first large visible
+    // windows. The credits must belong to the resizable application frame.
+    return (style & WS_CHILD) == 0 &&
+        (style & WS_CAPTION) == WS_CAPTION && (style & WS_SYSMENU) != 0 &&
+        (style & (WS_THICKFRAME | WS_MAXIMIZEBOX)) != 0 &&
+        (extendedStyle & WS_EX_TOOLWINDOW) == 0;
+}
+
+bool IsFullScreenMainFrame(LONG_PTR style, LONG_PTR extendedStyle,
+                           const RECT& bounds, const RECT& monitor,
+                           std::wstring_view title) {
+    return (style & WS_POPUP) != 0 && (style & WS_CHILD) == 0 &&
+        (extendedStyle & WS_EX_TOOLWINDOW) == 0 &&
+        EqualRect(&bounds, &monitor) && title.find(L"RizomUV") != title.npos;
+}
 
 BOOL CALLBACK FindMainRizomWindow(HWND window, LPARAM value) {
     DWORD processId = 0;
@@ -94,6 +115,19 @@ BOOL CALLBACK FindMainRizomWindow(HWND window, LPARAM value) {
     const LONG width = bounds.right - bounds.left;
     const LONG height = bounds.bottom - bounds.top;
     if (width < 500 || height < 300) return TRUE;
+    const LONG_PTR style = GetWindowLongPtrW(window, GWL_STYLE);
+    const LONG_PTR extendedStyle = GetWindowLongPtrW(window, GWL_EXSTYLE);
+    if (!IsMainFrameStyle(style, extendedStyle)) {
+        // Borderless fullscreen has no caption or resize frame. Keep it
+        // eligible without accepting ordinary startup or floating windows.
+        MONITORINFO monitor{sizeof(MONITORINFO), {}, {}, 0};
+        wchar_t title[512]{};
+        if (!GetMonitorInfoW(MonitorFromWindow(window, MONITOR_DEFAULTTONULL), &monitor) ||
+            !EqualRect(&bounds, &monitor.rcMonitor)) return TRUE;
+        GetWindowTextW(window, title, static_cast<int>(std::size(title)));
+        if (!IsFullScreenMainFrame(style, extendedStyle, bounds, monitor.rcMonitor, title))
+            return TRUE;
+    }
     const LONG64 area = static_cast<LONG64>(width) * height;
     auto* candidate = reinterpret_cast<MainWindowCandidate*>(value);
     if (area > candidate->area) {
@@ -152,6 +186,7 @@ int CalculateTextVerticalOffset(HDC referenceDc, HFONT font,
     SetTextColor(memoryDc, kLinkTextColor);
     DrawTextW(memoryDc, text, -1, &rect,
               DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    GdiFlush(); // DIB pixels are read directly below, after queued GDI writes.
     const auto* bitmapPixels = static_cast<const DWORD*>(pixels);
     int inkTop = height;
     int inkBottom = -1;
@@ -173,6 +208,7 @@ int CalculateTextVerticalOffset(HDC referenceDc, HFONT font,
 
 bool RenderLinkWindow(HWND window, const wchar_t* text,
                       int x, int y, int width, int height) {
+    if (width <= 0 || height <= 0) return false;
     HDC screenDc = GetDC(nullptr);
     HDC memoryDc = screenDc ? CreateCompatibleDC(screenDc) : nullptr;
     BITMAPINFO bitmapInfo{};
@@ -192,8 +228,14 @@ bool RenderLinkWindow(HWND window, const wchar_t* text,
         return false;
     }
     HBITMAP oldBitmap = reinterpret_cast<HBITMAP>(SelectObject(memoryDc, bitmap));
-    std::memset(pixels, 0, static_cast<size_t>(width) * height * sizeof(DWORD));
     HFONT font = CreateLinkFont(height);
+    if (!font) {
+        SelectObject(memoryDc, oldBitmap);
+        DeleteObject(bitmap);
+        DeleteDC(memoryDc);
+        ReleaseDC(nullptr, screenDc);
+        return false;
+    }
     HFONT oldFont = reinterpret_cast<HFONT>(SelectObject(memoryDc, font));
     RECT textRect{0, 0, width, height};
     HBRUSH background = CreateSolidBrush(kLinkTransparentColor);
@@ -205,6 +247,7 @@ bool RenderLinkWindow(HWND window, const wchar_t* text,
         memoryDc, font, text, width, height));
     DrawTextW(memoryDc, text, -1, &textRect,
               DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
+    GdiFlush();
     auto* bitmapPixels = static_cast<DWORD*>(pixels);
     const size_t pixelCount = static_cast<size_t>(width) * height;
     for (size_t index = 0; index < pixelCount; ++index) {
@@ -218,13 +261,20 @@ bool RenderLinkWindow(HWND window, const wchar_t* text,
     BLENDFUNCTION blend{AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
     const BOOL updated = UpdateLayeredWindow(window, screenDc, &destination,
         &size, memoryDc, &source, 0, &blend, ULW_ALPHA);
+    const DWORD updateError = updated ? ERROR_SUCCESS : GetLastError();
     SelectObject(memoryDc, oldFont);
     SelectObject(memoryDc, oldBitmap);
     DeleteObject(font);
     DeleteObject(bitmap);
     DeleteDC(memoryDc);
     ReleaseDC(nullptr, screenDc);
-    ShowWindow(window, SW_SHOWNOACTIVATE);
+    // Visibility is committed by the caller only after both surfaces exist.
+    // Keep the error observable without logging every window-move event.
+    DWORD& lastUpdateError = window == g_authorWindow ? g_authorUpdateError : g_gitHubUpdateError;
+    const DWORD reportedError = !updated && !updateError ? ERROR_GEN_FAILURE : updateError;
+    if (!updated && reportedError != lastUpdateError)
+        RuntimeLog(L"署名链接图层更新失败，错误码：" + std::to_wstring(reportedError));
+    lastUpdateError = reportedError;
     return updated != FALSE;
 }
 
@@ -292,21 +342,28 @@ void PositionCreditWindows() {
     const bool needsRender = height != g_authorHeight ||
                              !IsWindowVisible(g_authorWindow) ||
                              !IsWindowVisible(g_gitHubWindow);
-    g_authorX = authorX;
-    g_gitHubX = gitHubX;
-    g_authorY = y;
-    g_authorHeight = height;
     if (needsRender) {
-        RenderLinkWindow(g_authorWindow, kAuthorText, authorX, y,
-                         g_authorWidth, height);
-        RenderLinkWindow(g_gitHubWindow, kGitHubText, gitHubX, y,
-                         g_gitHubWidth, height);
+        const bool authorReady = RenderLinkWindow(g_authorWindow, kAuthorText,
+            authorX, y, g_authorWidth, height);
+        const bool gitHubReady = RenderLinkWindow(g_gitHubWindow, kGitHubText,
+            gitHubX, y, g_gitHubWidth, height);
+        if (!authorReady || !gitHubReady) {
+            ShowWindow(g_authorWindow, SW_HIDE);
+            ShowWindow(g_gitHubWindow, SW_HIDE);
+            return;
+        }
+        ShowWindow(g_authorWindow, SW_SHOWNOACTIVATE);
+        ShowWindow(g_gitHubWindow, SW_SHOWNOACTIVATE);
     } else {
         SetWindowPos(g_authorWindow, HWND_TOP, authorX, y, g_authorWidth, height,
                      SWP_NOACTIVATE | SWP_SHOWWINDOW);
         SetWindowPos(g_gitHubWindow, HWND_TOP, gitHubX, y, g_gitHubWidth, height,
                      SWP_NOACTIVATE | SWP_SHOWWINDOW);
     }
+    g_authorX = authorX;
+    g_gitHubX = gitHubX;
+    g_authorY = y;
+    g_authorHeight = height;
 }
 
 void CALLBACK CreditEventCallback(HWINEVENTHOOK, DWORD, HWND window,
@@ -322,6 +379,18 @@ void CALLBACK CreditEventCallback(HWINEVENTHOOK, DWORD, HWND window,
 LRESULT CALLBACK CreditWindowProcedure(HWND window, UINT message,
                                        WPARAM wParam, LPARAM lParam) {
     switch (message) {
+    case WM_TIMER:
+        if (wParam != kCreditsStartupRetry) break;
+        PositionCreditWindows();
+        if ((IsWindowVisible(g_authorWindow) && IsWindowVisible(g_gitHubWindow)) ||
+            GetTickCount64() >= g_creditsRetryDeadline) {
+            KillTimer(window, kCreditsStartupRetry);
+            if (IsWindowVisible(g_authorWindow) && IsWindowVisible(g_gitHubWindow))
+                RuntimeLog(L"Bilibili 署名和 GitHub 链接已绘制并显示");
+            else
+                RuntimeLog(L"署名链接启动重试已结束，后续随主窗口事件重新定位");
+        }
+        return 0;
     case WM_APP + 1:
         g_positionPending.store(false);
         PositionCreditWindows();
@@ -364,21 +433,33 @@ DWORD WINAPI RunCreditWindows(void*) {
         g_mainWindow = candidate.window;
         if (!g_mainWindow) Sleep(100);
     }
-    if (!g_mainWindow) { g_creditsStarted.store(false); return 1; }
+    if (!g_mainWindow) {
+        RuntimeLog(L"署名链接未找到可用主窗口，已结束本次启动检测");
+        g_creditsStarted.store(false);
+        return 1;
+    }
+    wchar_t className[128]{};
+    GetClassNameW(g_mainWindow, className, static_cast<int>(std::size(className)));
+    RuntimeLog(L"署名链接已绑定主窗口类：" + std::wstring(className));
     WNDCLASSW windowClass{};
     windowClass.lpfnWndProc = CreditWindowProcedure;
     windowClass.hInstance = g_creditsModule;
     windowClass.hCursor = LoadCursorW(nullptr, IDC_HAND);
     windowClass.lpszClassName = L"RizomUVChineseAuthorLink";
-    RegisterClassW(&windowClass);
+    if (!RegisterClassW(&windowClass) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+        RuntimeLog(L"署名链接窗口类注册失败，错误码：" + std::to_wstring(GetLastError()));
+        g_creditsStarted.store(false);
+        return 2;
+    }
     const DWORD style = WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_LAYERED;
     g_authorWindow = CreateWindowExW(style, windowClass.lpszClassName,
-        kAuthorText, WS_POPUP | WS_VISIBLE, 0, 0, 1, 1,
+        kAuthorText, WS_POPUP, 0, 0, 1, 1,
         g_mainWindow, nullptr, g_creditsModule, nullptr);
     g_gitHubWindow = CreateWindowExW(style, windowClass.lpszClassName,
-        kGitHubText, WS_POPUP | WS_VISIBLE, 0, 0, 1, 1,
+        kGitHubText, WS_POPUP, 0, 0, 1, 1,
         g_mainWindow, nullptr, g_creditsModule, nullptr);
     if (!g_authorWindow || !g_gitHubWindow) {
+        RuntimeLog(L"署名链接窗口创建失败，错误码：" + std::to_wstring(GetLastError()));
         if (g_authorWindow) DestroyWindow(g_authorWindow);
         if (g_gitHubWindow) DestroyWindow(g_gitHubWindow);
         g_authorWindow = g_gitHubWindow = nullptr;
@@ -395,6 +476,15 @@ DWORD WINAPI RunCreditWindows(void*) {
         nullptr, CreditEventCallback, GetCurrentProcessId(), 0,
         WINEVENT_OUTOFCONTEXT);
     PositionCreditWindows();
+    if (IsWindowVisible(g_authorWindow) && IsWindowVisible(g_gitHubWindow))
+        RuntimeLog(L"Bilibili 署名和 GitHub 链接已绘制并显示");
+    else {
+        // Startup can briefly lack a renderable surface. Retry for five seconds
+        // only; successful initialization returns to event-driven positioning.
+        g_creditsRetryDeadline = GetTickCount64() + 5000;
+        if (!SetTimer(g_authorWindow, kCreditsStartupRetry, 500, nullptr))
+            RuntimeLog(L"署名链接启动重试定时器创建失败");
+    }
     MSG message{};
     while (GetMessageW(&message, nullptr, 0, 0) > 0) {
         TranslateMessage(&message);

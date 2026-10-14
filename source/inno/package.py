@@ -7,6 +7,8 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+import shutil
+import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
@@ -55,6 +57,24 @@ def validate_dictionary(source):
     if not any(key and value for key, value in translations.items()):
         raise ValueError('Dictionary has no usable translations')
 
+    def validate_metadata(value, depth=0):
+        if depth > 64:
+            raise ValueError('Dictionary metadata exceeds runtime depth limit')
+        if isinstance(value, str):
+            value.encode('utf-8')
+        elif isinstance(value, dict):
+            for key, child in value.items():
+                key.encode('utf-8')
+                validate_metadata(child, depth + 1)
+        elif isinstance(value, list):
+            for child in value:
+                validate_metadata(child, depth + 1)
+
+    for key, value in data.items():
+        key.encode('utf-8')
+        if key != 'translations':
+            validate_metadata(value)
+
 
 def payload_entries():
     cfg = json.loads((HERE / 'product.json').read_text(encoding='utf-8'))
@@ -94,6 +114,34 @@ def includes(entries):
     return '\n'.join(files) + '\n', '\n'.join(code) + '\n'
 
 
+def snapshot_payload(entries, stage):
+    """Give the compiler immutable, hash-checked copies of the reviewed payload."""
+    result = []
+    for name, source, digest in entries:
+        snapshot = stage / 'payload' / Path(name.replace('\\', '/'))
+        snapshot.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, snapshot)
+        if hashlib.sha256(snapshot.read_bytes()).hexdigest() != digest:
+            raise ValueError(f'Payload changed while packaging: {source}')
+        result.append((name, snapshot, digest))
+    return result
+
+
+def publish_installer(source, destination):
+    """Validate output permissions before replacing the previous deliverable."""
+    pending = destination.with_name(f'.{destination.name}.{uuid.uuid4().hex}.tmp')
+    try:
+        with pending.open('xb') as output, source.open('rb') as input_file:
+            shutil.copyfileobj(input_file, output)
+        if os.name == 'nt':
+            # Private build directories carry private ACLs. A fresh output file
+            # inherits the public output directory, including on failed builds.
+            subprocess.run(['icacls', str(pending), '/reset'], check=True)
+        os.replace(pending, destination)
+    finally:
+        pending.unlink(missing_ok=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--iscc', type=Path, default=os.environ.get('INNO_ISCC', ROOT.parent / '_ThirdParty/InnoSetup/7.1.0/ISCC.exe'))
@@ -106,24 +154,31 @@ def main():
     support = ROOT / 'build/inno/support.dll'
     if not support.is_file(): parser.error('Build support.dll first: source/build_inno.bat')
     entries = payload_entries()
-    files, code = includes(entries)
     build = ROOT / 'build/inno'
+    build.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='package-', dir=build) as temporary:
         stage = Path(temporary)
+        files, code = includes(snapshot_payload(entries, stage))
+        support_snapshot = stage / 'support.dll'
+        support_digest = hashlib.sha256(support.read_bytes()).hexdigest()
+        shutil.copyfile(support, support_snapshot)
+        if hashlib.sha256(support_snapshot.read_bytes()).hexdigest() != support_digest:
+            raise ValueError('Installer support DLL changed while packaging')
         files_path, code_path = stage / 'payload.iss', stage / 'payload-code.iss'
         files_path.write_text(files, encoding='utf-8-sig')
         code_path.write_text(code, encoding='utf-8-sig')
         command = [str(args.iscc), f'/DPayloadInclude={files_path}', f'/DPayloadCode={code_path}',
-                   f'/DSupportDll={support}', f'/DPackageOutput={stage}', f'/DPackageVersion={args.version}']
+                   f'/DSupportDll={support_snapshot}', f'/DPackageOutput={stage}', f'/DPackageVersion={args.version}']
         if args.test_mode: command.append('/DTestMode=1')
         command.append(str(HERE / (cfg['id'] + '.iss')))
         subprocess.run(command, check=True, cwd=HERE)
         target = build / 'test-package' if args.test_mode else ROOT / 'dist'
         target.mkdir(parents=True, exist_ok=True)
         destination = target / (cfg['id'] + 'Installer.exe')
-        os.replace(stage / destination.name, destination)
+        publish_installer(stage / destination.name, destination)
     manifest = {'version': args.version, 'test_mode': args.test_mode, 'installer': str(destination),
                 'sha256': hashlib.sha256(destination.read_bytes()).hexdigest(),
+                'support_sha256': support_digest,
                 'payload': [{'name': name, 'sha256': digest} for name, _, digest in entries]}
     (build / ('test-manifest.json' if args.test_mode else 'manifest.json')).write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')

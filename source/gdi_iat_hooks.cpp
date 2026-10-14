@@ -54,7 +54,12 @@ bool ShouldLookupTranslation(LPCWSTR text, int length) {
 
 struct TextView { LPCWSTR text; int length; };
 
-TextView Translate(LPCWSTR text, int length) noexcept {
+void CountTranslationHit() noexcept {
+    if (g_countStartupHits.load(std::memory_order_relaxed))
+        g_translationHits.fetch_add(1, std::memory_order_relaxed);
+}
+
+TextView Translate(LPCWSTR text, int length, bool countHit = true) noexcept {
     const TextView original{text, length};
     if (!g_dictionary || !text) return original;
     if (length == -1) length = static_cast<int>(wcsnlen_s(text, 65536));
@@ -62,8 +67,8 @@ TextView Translate(LPCWSTR text, int length) noexcept {
     if (!ShouldLookupTranslation(text, length)) return original;
     const auto* translated = g_dictionary->Find(std::wstring_view(text, static_cast<size_t>(length)));
     if (!translated) return original;
-    if (g_countStartupHits.load(std::memory_order_relaxed))
-        g_translationHits.fetch_add(1, std::memory_order_relaxed);
+    if (*translated == std::wstring_view(text, static_cast<size_t>(length))) return original;
+    if (countHit) CountTranslationHit();
     // Immutable storage: no allocation or per-thread growing buffer, and a
     // recursive call cannot invalidate an outer call's translation.
     return {translated->c_str(), static_cast<int>(translated->size())};
@@ -73,13 +78,23 @@ TextView Translate(LPCWSTR text, int length) noexcept {
 // Explicit printer/metafile output is document data, so preserve its text.
 bool IsDisplayContext(HDC dc) noexcept {
     if (!dc) return false;
+    const DWORD error = GetLastError();
     const DWORD kind = GetObjectType(dc);
-    if (kind != OBJ_DC && kind != OBJ_MEMDC) return false;
-    return GetDeviceCaps(dc, TECHNOLOGY) == DT_RASDISPLAY;
+    const bool display = (kind == OBJ_DC || kind == OBJ_MEMDC) &&
+                         GetDeviceCaps(dc, TECHNOLOGY) == DT_RASDISPLAY;
+    SetLastError(error);
+    return display;
 }
 
 TextView TranslateForDisplay(HDC dc, LPCWSTR text, int count) noexcept {
-    return IsDisplayContext(dc) ? Translate(text, count) : TextView{text, count};
+    // Most calls are misses, paths or already-Chinese text. Device queries
+    // only matter when an actual substitution was found.
+    const TextView translated = Translate(text, count, false);
+    if (translated.text != text && IsDisplayContext(dc)) {
+        CountTranslationHit();
+        return translated;
+    }
+    return {text, count};
 }
 
 int WINAPI HookDrawTextW(HDC dc, LPCWSTR text, int count, LPRECT rect, UINT format) {
@@ -135,6 +150,7 @@ bool PatchSlot(void** slot, void* replacement, void* expected) {
 
 bool InstallGdiIatHooks(HMODULE targetModule, const TranslationDictionary* dictionary,
                         std::wstring& error) {
+    if (!targetModule || !dictionary) { error = L"GDI 接入参数无效"; return false; }
     static std::once_flag initialized;
     std::call_once(initialized, [dictionary] {
         g_dictionary = dictionary;

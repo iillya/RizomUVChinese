@@ -2,6 +2,7 @@
 #include "rizomuv_localizer/native_menu_localizer.h"
 #include "rizomuv_localizer/runtime_log.h"
 #include "rizomuv_localizer/translation_dictionary.h"
+#include "rizomuv_localizer/tooltip_hook.h"
 
 #include <windows.h>
 #include <psapi.h>
@@ -89,6 +90,10 @@ DWORD InitializeLocalizerImpl() {
     if (!InstallGdiIatHooks(GetModuleHandleW(nullptr), &g_dictionary, error)) {
         RuntimeLog(L"主程序 GDI 入口不可用，继续检测应用 DLL 和原生菜单：" + error);
     }
+    std::wstring tooltipStatus;
+    try { InstallTooltipHtmlHook(GetModuleHandleW(nullptr), g_dictionary, tooltipStatus); }
+    catch (...) { tooltipStatus = L"HTML 提示初始化失败，保留 GDI 翻译并继续启动检测"; }
+    RuntimeLog(tooltipStatus);
     if (StartMenuBarCredits(g_runtimeModule))
         RuntimeLog(L"菜单栏署名线程已启动");
     else
@@ -134,6 +139,8 @@ DWORD InitializeLocalizerImpl() {
 DWORD WINAPI InitializeLocalizer(void*) {
     try { return InitializeLocalizerImpl(); }
     catch (...) {
+        // A failed optional setup must not leave per-draw atomic statistics on.
+        rizomuv::localizer::FinishGdiStartupDiagnostics();
         OutputDebugStringW(L"RizomUV Chinese: initialization/refresh failed.\n");
         return 4;
     }

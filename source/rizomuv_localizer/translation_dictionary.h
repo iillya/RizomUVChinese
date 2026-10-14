@@ -22,6 +22,7 @@ public:
     bool Load(const std::filesystem::path& path, std::wstring& error);
     const std::wstring* Find(std::wstring_view source) const noexcept;
     size_t Size() const noexcept { return translations_.size(); }
+    const TranslationMap& Entries() const noexcept { return translations_; }
 
 private:
     TranslationMap translations_;
