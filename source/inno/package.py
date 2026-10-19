@@ -145,7 +145,7 @@ def publish_installer(source, destination):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--iscc', type=Path, default=os.environ.get('INNO_ISCC', ROOT.parent / '_ThirdParty/InnoSetup/7.1.0/ISCC.exe'))
-    parser.add_argument('--version', default='1.0.5')
+    parser.add_argument('--version', default=(ROOT / 'RELEASE_VERSION').read_text(encoding='ascii').strip())
     parser.add_argument('--test-mode', action='store_true')
     args = parser.parse_args()
     if not re.fullmatch(r'\d+\.\d+\.\d+(?:\.\d+)?', args.version): parser.error('Invalid version')
